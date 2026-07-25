@@ -1,0 +1,43 @@
+---
+title: "Vovora"
+summary: "A Telegram bot that transcribes voice notes and audio files using AssemblyAI, built with python-telegram-bot."
+cover: "/images/projects/vovora.jpg"
+stack: ["Python", "python-telegram-bot", "AssemblyAI"]
+status: "Live"
+year: 2025
+categories: ["Python", "Bots"]
+telegram: "https://t.me/vovorabot"
+featured: true
+---
+
+## Overview
+
+Vovora (@vovorabot) accepts a voice note or audio file in Telegram and returns a text transcript within seconds.
+
+## Problem
+
+Voice notes are convenient to send and inconvenient to search, skim, or forward as text.
+
+## Solution
+
+The bot streams incoming audio to the AssemblyAI REST API and returns a formatted transcript back into the same chat.
+
+## Architecture
+
+python-telegram-bot handles message intake, a small queue manages concurrent transcription jobs, and results are polled from AssemblyAI and pushed back to the user.
+
+## Technologies
+
+Python, python-telegram-bot, AssemblyAI REST API, hosted on Termux for 24/7 uptime.
+
+## Challenges
+
+Handling Telegram's file size limits for longer voice notes required chunked download and upload handling rather than a single request.
+
+## Lessons Learned
+
+A single, obvious use case (voice in, text out) outperforms adding more commands — most users just want the transcript.
+
+## Future Improvements
+
+Add speaker labeling and multi-language support.

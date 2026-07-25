@@ -1,0 +1,45 @@
+---
+title: "Dupload Bot"
+summary: "A Telegram bot that downloads videos from X, TikTok, Facebook, Pinterest, YouTube, and 1000+ other platforms via yt-dlp, with automatic compression and queue management."
+cover: "/images/projects/dupload.jpg"
+stack: ["Node.js", "Telegraf", "yt-dlp", "ffmpeg"]
+status: "Live"
+year: 2026
+categories: ["Node.js", "Telegram Bot"]
+telegram: "https://t.me/duploadebot"
+featured: true
+---
+
+## Overview
+
+Dupload Bot lets anyone download videos from social platforms directly inside Telegram — paste a link, get the video. No apps, no browser extensions, no accounts required.
+
+## Problem
+
+Downloading videos from X, TikTok, Facebook, and other platforms typically means leaving Telegram, finding a third-party site, dealing with ads, and manually saving files. Most tools also break frequently as platforms update their frontends.
+
+## Solution
+
+A Telegram bot that wraps yt-dlp — the most actively maintained video extraction engine available — and handles the full pipeline inside a single chat message. Paste a link, the bot fetches the best available quality, compresses if needed, and delivers the file directly.
+
+## Architecture
+
+A Node.js process running on Termux handles incoming Telegram messages via Telegraf, spawns yt-dlp as a child process for each download job, runs ffmpeg compression if the output exceeds Telegram's 50MB bot upload limit, then uploads via a manually constructed HTTP/1.1 multipart request that bypasses Telegraf's internal HTTP client.
+
+A per-chat job queue ensures concurrent links are processed in order rather than dropped, and a `/stop` command kills the active yt-dlp child process immediately via SIGKILL.
+
+## Technologies
+
+Node.js, Telegraf, yt-dlp, ffmpeg, node-fetch, form-data, deployed on Termux (Android) with PM2 for process persistence.
+
+## Challenges
+
+Telegram's Bot API consistently dropped multipart file uploads on Android's network stack with a "socket hang up" error — even on healthy connections with confirmed upload bandwidth. Standard fixes (retry logic, battery optimization settings, wake locks) had no effect. Root-causing it required isolating the upload step with raw curl using `--http1.1`, which revealed HTTP/2 negotiation as the culprit. The fix was bypassing Telegraf's HTTP client entirely and building the sendVideo request manually with an explicit HTTP/1.1 agent attached directly to the fetch call.
+
+## Lessons Learned
+
+Framework abstractions hide transport-layer behavior in ways that are hard to debug from the outside. When a curl test and a Node fetch call produce different results for the same endpoint, the difference is almost always in how they negotiate the connection — not in the payload.
+
+## Future Improvements
+
+Add cookie-based authentication for platforms that require login (Instagram), support for audio-only extraction, and per-user download history.

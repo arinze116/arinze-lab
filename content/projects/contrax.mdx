@@ -1,0 +1,45 @@
+---
+title: "Contrax"
+summary: "A Telegram bot that analyzes EVM and Solana smart contracts for risk signals before you interact with them."
+cover: "/images/projects/contrax.jpg"
+stack: ["Node.js", "Telegraf", "Solidity", "Solana Web3.js"]
+status: "In Progress"
+year: 2026
+categories: ["Blockchain", "Bots"]
+
+featured: true
+---
+
+## Overview
+
+Contrax is a Telegram bot that lets a user paste a contract address and get back a plain-language risk summary, covering ownership, mint functions, liquidity locks, and known scam patterns.
+
+## Problem
+
+Most retail users interacting with new contracts have no fast way to check whether a token or contract is safe before they sign a transaction. Existing tools are either too technical or too slow for the pace people actually trade at.
+
+## Solution
+
+Contrax pulls contract bytecode and metadata from EVM and Solana RPC endpoints, runs a set of heuristic checks, and returns a scored summary directly inside Telegram, where the decision is actually being made.
+
+## Architecture
+
+- Telegram bot layer (Telegraf) handles commands and formatting.
+- A scanning service fetches bytecode/ABI and metadata per chain.
+- A scoring engine applies heuristics for ownership, mint authority, and liquidity.
+
+## Technologies
+
+Node.js, Telegraf, ethers.js, Solana Web3.js, hosted on a persistent Termux instance.
+
+## Challenges
+
+Solana account structures required a very different scanning approach than EVM bytecode analysis, so the scoring engine had to be split into chain-specific modules behind a shared interface.
+
+## Lessons Learned
+
+Heuristic scoring is only as good as the signal set behind it — false confidence is worse than no answer, so uncertain results are surfaced as "unknown" rather than a fake score.
+
+## Future Improvements
+
+Add a web dashboard, expand chain support, and let users subscribe to alerts on contracts they're watching.

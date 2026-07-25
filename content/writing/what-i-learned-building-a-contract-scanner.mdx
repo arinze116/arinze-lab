@@ -1,0 +1,23 @@
+---
+title: "What I Learned Building a Contract Scanner"
+description: "Heuristic risk scoring for smart contracts is harder than it looks — lessons from building Contrax."
+date: "2026-06-20"
+category: "Blockchain"
+tags: ["Solidity", "Solana", "Security"]
+---
+
+## The naive first version
+
+The first version of the scanner checked for a handful of obvious red flags — unverified source, no liquidity lock — and scored contracts from 0 to 100. It felt useful until I started testing it against contracts I already knew were safe.
+
+## Where scoring breaks down
+
+A single number hides more than it reveals. Two contracts with the same score can carry completely different kinds of risk, and collapsing that into one metric misleads more than it helps.
+
+## The fix
+
+The scanner now reports individual signals instead of a single score, and marks anything it can't confidently evaluate as unknown rather than guessing.
+
+## The bigger lesson
+
+A tool that says "I don't know" when it doesn't know is more trustworthy than one that always has an answer.

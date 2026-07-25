@@ -1,0 +1,23 @@
+---
+title: "How I Built My First Telegram Bot"
+description: "Notes on going from a single Python script to a bot that stayed online for months, including the mistakes that taught me the most."
+date: "2026-05-12"
+category: "Development"
+tags: ["Telegram", "Python", "Bots"]
+---
+
+## Starting simple
+
+My first bot did one thing: reply "pong" to "/ping". That was the entire spec, and it was the right place to start, because it forced me to get the deployment loop working before I had any real logic to debug.
+
+## The first real feature
+
+Once the skeleton worked, I added a single command that fetched data from an API and formatted it for chat. This is where most of the early mistakes showed up — timeouts, malformed responses, and rate limits I hadn't accounted for.
+
+## Keeping it running
+
+Running on a phone with Termux instead of a cloud server meant I had to think differently about uptime. A process manager and a simple restart script did more for reliability than almost anything else I added.
+
+## What I'd tell myself earlier
+
+Log everything from day one. The bugs that matter always show up in production first, and without logs you're just guessing.

@@ -1,0 +1,41 @@
+---
+title: "Heuristic Risk Scoring for Smart Contracts"
+summary: "An evaluation of heuristic-based approaches to pre-transaction contract risk scoring across EVM and Solana."
+topic: "Blockchain"
+date: "2026-06-28"
+---
+
+## Introduction
+
+This research examines the effectiveness of heuristic-based risk scoring for smart contracts, using Contrax as the primary test implementation across EVM and Solana chains.
+
+## Background
+
+Most existing contract-safety tools rely on either static analysis of verified source code or crowd-sourced blocklists, both of which fail for freshly deployed, unverified contracts.
+
+## Objectives
+
+- Identify signals available before source verification exists.
+- Evaluate false-positive and false-negative rates for common heuristics.
+- Determine which signals generalize across EVM and Solana.
+
+## Methodology
+
+A set of 12 heuristics — ownership renouncement, mint authority, liquidity lock status, and holder concentration among them — were applied to a sample of 250 contracts with known outcomes, split evenly between EVM and Solana.
+
+## Results
+
+Ownership and mint-authority signals produced the lowest false-positive rates on EVM. Solana's account model required different equivalents, since there is no direct analog to contract ownership.
+
+## Discussion
+
+No single heuristic was reliable enough to stand alone. Combining signals into a reported set, rather than a collapsed score, produced results users trusted more in informal testing.
+
+## Conclusion
+
+Heuristic scoring is a useful first line of defense, but should be presented as a set of individual, inspectable signals rather than a single confidence number.
+
+## References
+
+- Public RPC documentation for EVM and Solana chains.
+- Internal test results from the Contrax scanning engine.

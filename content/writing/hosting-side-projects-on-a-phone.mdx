@@ -1,0 +1,23 @@
+---
+title: "Hosting Side Projects on a Phone"
+description: "Why I run several bots and services out of Termux on an old Samsung S10, and what that setup actually looks like."
+date: "2026-03-02"
+category: "Development"
+tags: ["Termux", "DevOps", "Bots"]
+---
+
+## Why a phone
+
+A spare Android phone is a computer that's already paid for, already has a battery backup, and is already online. For a handful of lightweight Node.js and Python bots, that's enough.
+
+## The setup
+
+Termux gives a real Linux userland on Android. Combined with a process manager and a cron-based watchdog, it's stable enough to run several bots continuously without a dedicated server.
+
+## Trade-offs
+
+This isn't a setup for anything that needs guaranteed uptime or heavy compute. It's a setup for validating ideas cheaply before deciding whether something deserves real infrastructure.
+
+## What moves to the cloud
+
+Once a project has real users or needs to scale past what a phone can handle, it moves to a proper host. The phone is a proving ground, not a permanent home.
