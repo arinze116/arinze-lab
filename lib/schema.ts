@@ -74,7 +74,7 @@ export function articleSchema(input: {
     datePublished: input.datePublished,
     dateModified: input.datePublished,
     inLanguage: "en",
-    image: input.image ? `${SITE_URL}${input.image}` : `${SITE_URL}/images/og-default.svg`,
+    image: input.image ? `${SITE_URL}${input.image}` : `${SITE_URL}/opengraph-image`,
     author: { "@type": "Person", "@id": `${SITE_URL}/#person`, name: siteConfig.authorName },
     publisher: { "@id": `${SITE_URL}/#person` },
   };

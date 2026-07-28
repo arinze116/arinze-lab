@@ -19,19 +19,19 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
+    // og:image is injected automatically by app/opengraph-image.tsx.
     title: `${siteConfig.name} — Software Developer & Researcher`,
     description: siteConfig.description,
     type: "website",
     url: siteConfig.url,
     siteName: siteConfig.name,
     locale: "en_US",
-    images: ["/images/og-default.svg"],
   },
   twitter: {
+    // twitter:image is injected automatically by app/twitter-image.tsx.
     card: "summary_large_image",
     title: `${siteConfig.name} — Software Developer & Researcher`,
     description: siteConfig.description,
-    images: ["/images/og-default.svg"],
   },
 };
 
