@@ -1,10 +1,18 @@
+import type { Metadata } from "next";
 import { Github, Linkedin, Twitter, Mail, MapPin } from "lucide-react";
 import { ContactForm } from "@/components/sections/contact-form";
 import { siteConfig } from "@/lib/site";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Contact",
   description: "Get in touch with Arinze for projects, collaborations, or questions.",
+  alternates: { canonical: "/contact" },
+  openGraph: {
+    title: "Contact",
+    description: "Get in touch with Arinze for projects, collaborations, or questions.",
+    url: "/contact",
+    type: "website",
+  },
 };
 
 export default function ContactPage() {

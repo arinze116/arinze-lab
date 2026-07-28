@@ -1,20 +1,41 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Github, Send, ArrowUpRight, ArrowLeft } from "lucide-react";
 import { getAllProjects, getProjectBySlug } from "@/lib/content";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { JsonLd } from "@/components/json-ld";
+import { softwareApplicationSchema, breadcrumbSchema } from "@/lib/schema";
 
 export function generateStaticParams() {
   return getAllProjects().map((p) => ({ slug: p.slug }));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   try {
     const { meta } = getProjectBySlug(slug);
-    return { title: meta.title, description: meta.summary };
+    const url = `/projects/${slug}`;
+    return {
+      title: meta.title,
+      description: meta.summary,
+      alternates: { canonical: url },
+      openGraph: {
+        title: meta.title,
+        description: meta.summary,
+        url,
+        type: "website",
+        images: meta.cover ? [meta.cover] : undefined,
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: meta.title,
+        description: meta.summary,
+        images: meta.cover ? [meta.cover] : undefined,
+      },
+    };
   } catch {
     return {};
   }
@@ -58,6 +79,21 @@ export default async function ProjectDetailPage({
 
   return (
     <article className="mx-auto max-w-[880px] px-5 py-16 md:px-8">
+      <JsonLd
+        data={[
+          softwareApplicationSchema({
+            path: `/projects/${meta.slug}`,
+            name: meta.title,
+            description: meta.summary,
+            image: meta.cover,
+          }),
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Projects", path: "/projects" },
+            { name: meta.title, path: `/projects/${meta.slug}` },
+          ]),
+        ]}
+      />
       <Link href="/projects/" className="inline-flex items-center gap-1 text-sm text-[var(--color-text-secondary)] hover:text-white">
         <ArrowLeft size={14} /> Back to Projects
       </Link>

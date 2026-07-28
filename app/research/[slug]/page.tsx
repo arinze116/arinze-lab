@@ -1,18 +1,38 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { getAllResearch, getResearchBySlug } from "@/lib/content";
 import { Badge } from "@/components/ui/badge";
+import { JsonLd } from "@/components/json-ld";
+import { articleSchema, breadcrumbSchema } from "@/lib/schema";
 
 export function generateStaticParams() {
   return getAllResearch().map((p) => ({ slug: p.slug }));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   try {
     const { meta } = getResearchBySlug(slug);
-    return { title: meta.title, description: meta.summary };
+    const url = `/research/${slug}`;
+    return {
+      title: meta.title,
+      description: meta.summary,
+      alternates: { canonical: url },
+      openGraph: {
+        title: meta.title,
+        description: meta.summary,
+        url,
+        type: "article",
+        publishedTime: meta.date,
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: meta.title,
+        description: meta.summary,
+      },
+    };
   } catch {
     return {};
   }
@@ -53,6 +73,21 @@ export default async function ResearchDetailPage({
 
   return (
     <article className="mx-auto max-w-[720px] px-5 py-16 md:px-8">
+      <JsonLd
+        data={[
+          articleSchema({
+            path: `/research/${meta.slug}`,
+            title: meta.title,
+            description: meta.summary,
+            datePublished: meta.date,
+          }),
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Research", path: "/research" },
+            { name: meta.title, path: `/research/${meta.slug}` },
+          ]),
+        ]}
+      />
       <Link href="/research" className="inline-flex items-center gap-1 text-sm text-[var(--color-text-secondary)] hover:text-white">
         <ArrowLeft size={14} /> Back to Research
       </Link>

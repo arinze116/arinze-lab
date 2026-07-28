@@ -1,9 +1,17 @@
+import type { Metadata } from "next";
 import { getAllWriting } from "@/lib/content";
 import { WritingExplorer } from "@/components/sections/writing-explorer";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Writing",
   description: "Articles, tutorials, engineering notes, and lessons from building software.",
+  alternates: { canonical: "/writing" },
+  openGraph: {
+    title: "Writing",
+    description: "Articles, tutorials, engineering notes, and lessons from building software.",
+    url: "/writing",
+    type: "website",
+  },
 };
 
 export default function WritingPage() {

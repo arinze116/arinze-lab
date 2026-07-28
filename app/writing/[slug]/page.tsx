@@ -1,18 +1,40 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { getAllWriting, getWritingBySlug } from "@/lib/content";
 import { Badge } from "@/components/ui/badge";
+import { JsonLd } from "@/components/json-ld";
+import { articleSchema, breadcrumbSchema } from "@/lib/schema";
 
 export function generateStaticParams() {
   return getAllWriting().map((p) => ({ slug: p.slug }));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   try {
     const { meta } = getWritingBySlug(slug);
-    return { title: meta.title, description: meta.description };
+    const url = `/writing/${slug}`;
+    return {
+      title: meta.title,
+      description: meta.description,
+      alternates: { canonical: url },
+      openGraph: {
+        title: meta.title,
+        description: meta.description,
+        url,
+        type: "article",
+        publishedTime: meta.date,
+        tags: meta.tags,
+        images: meta.featuredImage ? [meta.featuredImage] : undefined,
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: meta.title,
+        description: meta.description,
+      },
+    };
   } catch {
     return {};
   }
@@ -59,6 +81,22 @@ export default async function WritingDetailPage({
 
   return (
     <article className="mx-auto max-w-[720px] px-5 py-16 md:px-8">
+      <JsonLd
+        data={[
+          articleSchema({
+            path: `/writing/${meta.slug}`,
+            title: meta.title,
+            description: meta.description,
+            datePublished: meta.date,
+            image: meta.featuredImage,
+          }),
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Writing", path: "/writing" },
+            { name: meta.title, path: `/writing/${meta.slug}` },
+          ]),
+        ]}
+      />
       <Link href="/writing" className="inline-flex items-center gap-1 text-sm text-[var(--color-text-secondary)] hover:text-white">
         <ArrowLeft size={14} /> Back to Writing
       </Link>

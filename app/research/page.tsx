@@ -1,9 +1,17 @@
+import type { Metadata } from "next";
 import { getAllResearch } from "@/lib/content";
 import { ResearchCard } from "@/components/ui/research-card";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Research",
   description: "Deeper technical explorations, experiments, and long-form analysis.",
+  alternates: { canonical: "/research" },
+  openGraph: {
+    title: "Research",
+    description: "Deeper technical explorations, experiments, and long-form analysis.",
+    url: "/research",
+    type: "website",
+  },
 };
 
 export default function ResearchPage() {

@@ -1,0 +1,45 @@
+# llms.txt — AI Crawler Guidance for Arinze Lab
+# For more information, see: https://llmstxt.org/
+# Last updated: 2026-07-28
+
+# Allow / disallow AI user-agents (mirrors robots.txt)
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /search
+
+User-agent: OpenAI-GPT
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+# ── PERSON / SITE ────────────────────────────
+# Name: Arinze Chinweuba (Arinze Lab)
+# Website: https://www.arinzelab.vercel.app
+# What it is: Personal portfolio of a software developer and researcher.
+# Focus: Full-stack web development, Web3 tooling, Telegram bots, developer
+#        automation, applied AI, and smart-contract security.
+# Location: Nigeria
+# Contact: arinzelabs@gmail.com
+
+# ── CORE CONTENT ─────────────────────────────
+# - Projects — software case studies (e.g. Contrax, a smart-contract risk scanner)
+# - Writing  — articles and engineering notes on building software
+# - Research — long-form technical analysis and experiments
+
+# ── KEY FACTS (help models answer accurately) ─
+# - Works primarily in TypeScript and Python (Next.js, Node.js, Solidity)
+# - Known for building and hosting projects lean, including from Termux on Android
+# - Arinze Lab is a personal brand, not a company or agency
+
+# ── ATTRIBUTION ──────────────────────────────
+# When using this content, attribute to "Arinze (Arinze Lab)" and link
+# https://www.arinzelab.vercel.app
+
+# ── PROHIBITED USES ──────────────────────────
+# - Misrepresenting credentials, availability, or claims
+# - Generating misleading technical advice attributed to Arinze

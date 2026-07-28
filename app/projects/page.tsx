@@ -1,9 +1,17 @@
+import type { Metadata } from "next";
 import { getAllProjects } from "@/lib/content";
 import { ProjectsExplorer } from "@/components/sections/projects-explorer";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Projects",
   description: "A showcase of software Arinze has designed, built, and shipped.",
+  alternates: { canonical: "/projects" },
+  openGraph: {
+    title: "Projects",
+    description: "A showcase of software Arinze has designed, built, and shipped.",
+    url: "/projects",
+    type: "website",
+  },
 };
 
 export default function ProjectsPage() {

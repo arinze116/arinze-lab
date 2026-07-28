@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { JsonLd } from "@/components/json-ld";
+import { faqSchema, breadcrumbSchema } from "@/lib/schema";
 
 const timeline = [
   { year: "2026", label: "Started programming" },
@@ -39,14 +42,30 @@ const faqs = [
   },
 ];
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "About",
   description: "Arinze's professional background, skills, and values.",
+  alternates: { canonical: "/about" },
+  openGraph: {
+    title: "About",
+    description: "Arinze's professional background, skills, and values.",
+    url: "/about",
+    type: "profile",
+  },
 };
 
 export default function AboutPage() {
   return (
     <>
+      <JsonLd
+        data={[
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "About", path: "/about" },
+          ]),
+          faqSchema(faqs),
+        ]}
+      />
       <section className="mx-auto max-w-[1280px] px-5 py-16 md:px-8">
         <div className="grid items-center gap-12 md:grid-cols-2">
           <div>

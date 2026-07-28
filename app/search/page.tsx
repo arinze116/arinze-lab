@@ -1,9 +1,13 @@
+import type { Metadata } from "next";
 import { getAllProjects, getAllWriting, getAllResearch } from "@/lib/content";
 import { SearchClient } from "@/components/sections/search-client";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Search",
   description: "Search projects, writing, and research on Arinze Lab.",
+  alternates: { canonical: "/search" },
+  // Thin utility page with no unique crawlable content — keep it out of the index.
+  robots: { index: false, follow: true },
 };
 
 export default function SearchPage() {

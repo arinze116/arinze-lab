@@ -1,6 +1,15 @@
-export const metadata = {
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
   title: "Privacy Policy",
   description: "How Arinze Lab handles visitor data.",
+  alternates: { canonical: "/privacy-policy" },
+  openGraph: {
+    title: "Privacy Policy",
+    description: "How Arinze Lab handles visitor data.",
+    url: "/privacy-policy",
+    type: "website",
+  },
 };
 
 export default function PrivacyPolicyPage() {

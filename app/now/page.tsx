@@ -1,10 +1,18 @@
+import type { Metadata } from "next";
 import { Target, BookOpen, Hammer, Headphones, Clock } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Now",
   description: "What Arinze is currently focused on.",
+  alternates: { canonical: "/now" },
+  openGraph: {
+    title: "Now",
+    description: "What Arinze is currently focused on.",
+    url: "/now",
+    type: "website",
+  },
 };
 
 const nowData = {

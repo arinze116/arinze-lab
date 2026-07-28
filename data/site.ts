@@ -3,7 +3,7 @@ export const site = {
   title: "Arinze Lab — Software developer & researcher",
   description:
     "I'm Arinze, a software developer and researcher. Arinze Lab is where I showcase my work, document ideas, and share what I learn through building.",
-  url: "https://0xchris.vercel.app",
+  url: "https://www.arinzelab.vercel.app",
   email: "arinzelabs@gmail.com",
   location: "Nigeria",
   social: {
