@@ -19,7 +19,7 @@ Allow: /
 
 # ── PERSON / SITE ────────────────────────────
 # Name: Arinze Chinweuba (Arinze Lab)
-# Website: https://www.arinzelab.vercel.app
+# Website: https://arinzelab.vercel.app
 # What it is: Personal portfolio of a software developer and researcher.
 # Focus: Full-stack web development, Web3 tooling, Telegram bots, developer
 #        automation, applied AI, and smart-contract security.
@@ -38,7 +38,7 @@ Allow: /
 
 # ── ATTRIBUTION ──────────────────────────────
 # When using this content, attribute to "Arinze (Arinze Lab)" and link
-# https://www.arinzelab.vercel.app
+# https://arinzelab.vercel.app
 
 # ── PROHIBITED USES ──────────────────────────
 # - Misrepresenting credentials, availability, or claims

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Github, Linkedin, Twitter, Mail } from "lucide-react";
-import { navigation, site } from "@/data/site";
+import { navItems, siteConfig } from "@/lib/site";
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -10,7 +10,7 @@ export function Footer() {
       <div className="mx-auto max-w-[1280px] px-5 py-12 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
           <div>
-            <div className="text-base font-semibold">{site.name}</div>
+            <div className="text-base font-semibold">{siteConfig.name}</div>
             <p className="mt-3 max-w-xs text-sm text-[color:var(--color-text-secondary)]">
               A portfolio documenting my work, projects, research, and
               technical writing.
@@ -18,7 +18,7 @@ export function Footer() {
           </div>
 
           <div className="grid grid-flow-col grid-rows-3 gap-x-8 gap-y-2">
-            {navigation.map((item) => (
+            {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -31,7 +31,7 @@ export function Footer() {
 
           <div className="flex gap-4 md:justify-end items-start">
             <Link
-              href={site.social.github}
+              href={siteConfig.socials.github}
               target="_blank"
               rel="noreferrer"
               aria-label="GitHub"
@@ -40,7 +40,7 @@ export function Footer() {
               <Github size={18} />
             </Link>
             <Link
-              href={site.social.linkedin}
+              href={siteConfig.socials.linkedin}
               target="_blank"
               rel="noreferrer"
               aria-label="LinkedIn"
@@ -49,7 +49,7 @@ export function Footer() {
               <Linkedin size={18} />
             </Link>
             <Link
-              href={site.social.x}
+              href={siteConfig.socials.x}
               target="_blank"
               rel="noreferrer"
               aria-label="X"
@@ -58,7 +58,7 @@ export function Footer() {
               <Twitter size={18} />
             </Link>
             <Link
-              href={`mailto:${site.email}`}
+              href={`mailto:${siteConfig.email}`}
               aria-label="Email"
               className="text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-text-primary)] transition-colors"
             >
@@ -68,7 +68,7 @@ export function Footer() {
         </div>
 
         <div className="mt-10 border-t border-[color:var(--color-border)] pt-6 text-xs text-[color:var(--color-text-secondary)]">
-          © {year} {site.name}. All rights reserved.
+          © {year} {siteConfig.name}. All rights reserved.
         </div>
       </div>
     </footer>

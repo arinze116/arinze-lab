@@ -1,6 +1,6 @@
 // Canonical production origin. Single source of truth for metadataBase,
 // the sitemap, robots, canonical tags, JSON-LD, and llms.txt. No trailing slash.
-export const SITE_URL = "https://www.arinzelab.vercel.app";
+export const SITE_URL = "https://arinzelab.vercel.app";
 
 export const siteConfig = {
   name: "ArinzeLab.",
