@@ -1,23 +1,43 @@
 ---
 title: "How I Built My First Telegram Bot"
 description: "Notes on going from a single Python script to a bot that stayed online for months, including the mistakes that taught me the most."
-date: "2026-05-12"
+date: "2026-07-29"
 category: "Development"
 tags: ["Telegram", "Python", "Bots"]
 ---
 
 ## Starting simple
 
-My first bot did one thing: reply "pong" to "/ping". That was the entire spec, and it was the right place to start, because it forced me to get the deployment loop working before I had any real logic to debug.
+Notes on the NFT sniper bot I never quite finished, and what it taught me anyway.
 
-## The first real feature
+**The idea**
 
-Once the skeleton worked, I added a single command that fetched data from an API and formatted it for chat. This is where most of the early mistakes showed up — timeouts, malformed responses, and rate limits I hadn't accounted for.
+I wanted to build something with actual teeth, not another "reply to /start" toy. NFT drops move fast, and the people who catch the good ones aren't refreshing OpenSea by hand, they've got something watching for them. So that became the plan: a bot that hooked into OpenSea's Stream API, caught new listings the second they hit, and reacted before a human ever could.
 
-## Keeping it running
+**Building the core**
 
-Running on a phone with Termux instead of a cloud server meant I had to think differently about uptime. A process manager and a simple restart script did more for reliability than almost anything else I added.
+I started with the sniper path itself, aiming to get from "listing appears" to "action taken" in under two seconds. That number sounds small until you're the one trying to hit it. Every extra network call, every unnecessary await, ate into that budget, so I had to actually think about where time was going instead of just writing code that worked eventually.
 
-## What I'd tell myself earlier
+Alongside that I added SQLite for persistence, so a crash or restart wouldn't wipe out whatever state the bot had built up. Wallets got AES-256-GCM encryption, because handling private keys carelessly is the kind of mistake you only make once if you're lucky. And I built in multi-RPC failover early, since relying on a single RPC endpoint felt like leaving the whole project one outage away from being useless.
 
-Log everything from day one. The bugs that matter always show up in production first, and without logs you're just guessing.
+By the time I was done with that layer, it genuinely felt like a real piece of infrastructure. Not flashy, but solid.
+
+**Where it fell apart**
+
+The problem wasn't the code. It was the network.
+
+I did most of my early building on a Samsung S10 running Termux, moving between that and VS Code on Windows depending on what I'm doing. That setup has worked for a lot of projects, but with this one I kept hitting something new: deep packet inspection blocking Telegram's API outright. Not a rate limit I could back off from, not a malformed request I could fix, just silence. Requests going out and nothing coming back.
+
+I spent longer than I'd like to admit assuming it was my fault. Rewriting request logic, adding retries, second-guessing my own connection handling, before realizing that no amount of retry logic fixes a connection that's being blocked upstream. At that point it wasn't a coding problem anymore, it was an infrastructure fight I didn't have the tools to win from where I was sitting. So I shelved it.
+
+**What came out of it anyway**
+
+It's easy to file that under "failed project" and move on, but the parts I got right didn't go to waste. Encrypting wallets properly instead of taking shortcuts, treating RPC failover as a requirement instead of an afterthought, structuring state so a crash mid-run wouldn't cost me everything, those habits didn't disappear when the project did. They just showed up again in the next thing I built, already baked in.
+
+There's also something to be said for building the part that scares you first. The sniper path and the security layer were the hardest parts of that project, and I got both working before the network took the whole thing down. That's still a win, even if the bot itself never shipped.
+
+**What I'd tell myself earlier**
+
+Test your network path before you test your logic. I lost real time convinced my code was broken when the actual problem was completely out of my hands. If I'd checked that connectivity assumption on day one instead of day twelve, I'd have known to route around it, or at least known not to blame myself for it.
+
+And log everything from the start. When something fails silently the way that connection did, logs are the only honest witness you've got. Without them you're just guessing between "my code is wrong" and "the world is blocking me," and those two problems need completely different fixes.

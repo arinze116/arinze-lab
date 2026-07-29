@@ -1,0 +1,31 @@
+---
+title: "Vovora: Building a Transcription Bot That Doesn't Fall Over"
+description: "Notes on building @vovorabot, an async Telegram transcription bot running on AssemblyAI, and everything that went into making it hold up in production."
+date: "2026-07-29"
+category: "Bots"
+tags: ["Python", "aiogram", "AssemblyAI", "Termux"]
+---
+
+**What it is**
+
+Vovora, @vovorabot on Telegram, takes audio or video and hands back a transcript. Up to 8 hours of it, with speaker diarization, keyterm prompting, and the option to force a language instead of guessing. It's not a weekend script, it's a real production system, and most of the work went into the parts you don't see: queueing, recovery, and staying alive when things go wrong.
+
+**The stack**
+
+Vovora runs on aiogram 3.x talking to AssemblyAI's REST API directly. I deliberately kept pydantic out of it, plain dotenv and dataclasses instead, because pydantic has a habit of causing headaches on Termux that aren't worth fighting. Everything else is async: aiosqlite, aiohttp, aiofiles. If one part of the stack blocks, the whole thing backs up, so keeping it async end to end wasn't optional.
+
+**Getting the Python version right**
+
+I learned this one the hard way. Python 3.12 is the safe target across both my dev environment and Termux, newer versions have a way of quietly breaking things that used to work. And after any Termux Python upgrade, `python -m pip` is the only pip invocation I trust anymore, the bare `pip` binary tends to point at the wrong interpreter and fail in ways that don't explain themselves.
+
+**Handling large files without choking**
+
+Telegram's Bot API caps direct uploads at 20 MB, which is nothing for an 8-hour audio file. Vovora gets around that two ways: a local Bot API server option in the config that bypasses the 20 MB ceiling entirely, and support for URL-based files up to 2 GB for anything too large even for that. On the upload side, files stream to AssemblyAI in 5 MB chunks rather than loading the whole thing into RAM first, which matters a lot when you're running this on a phone and not a server with memory to spare.
+
+**The architecture underneath**
+
+What started as a bot script grew into something closer to real infrastructure: 26 modules, 5 workers, a queue system, a health monitor, and job recovery so a crash mid-transcription doesn't just lose the job. There are dedicated Termux scripts to keep it running on-device. None of this was the plan on day one, it's what the bot turned into once I started taking uptime seriously instead of just getting a demo working.
+
+**The bigger lesson**
+
+A transcription bot doesn't feel complicated until you're the one holding it together at 2 AM because a job died halfway through an hour-long file. Queueing and recovery aren't features you add for polish, they're what separates a bot that works in a demo from one you can actually trust with someone else's audio.

@@ -1,0 +1,27 @@
+---
+title: "Building Dupload: A Video Downloader That Actually Uploads"
+description: "yt-dlp and ffmpeg make the download easy, the real work was getting Telegram and Termux to agree on anything."
+date: "2026-07-29"
+category: "Bots"
+tags: ["Node.js", "Telegraf", "Termux"]
+---
+
+**What it does**
+
+Send it a link, get a video back. That's the pitch, and most of the work has gone into making that simple exchange hold up across platforms that don't play nicely with each other. Dupload runs from `~/Downloader-bot` on Termux, on the same S10 setup the rest of my bots live on, built on Node.js and Telegraf, with yt-dlp doing the heavy lifting and ffmpeg cleaning up after it.
+
+**The HTTP/2 problem**
+
+The first real wall I hit was uploads silently failing on Termux over HTTP/2. Multipart uploads would just break, no clear error, no obvious cause. Turned out Android's networking stack and Telegram's HTTP/2 handling weren't agreeing with each other. The fix was forcing HTTP/1.1 through a custom `https.Agent` with `ALPNProtocols` locked to `['http/1.1']`, which sounds small but took a while to actually track down.
+
+**Making it usable, not just functional**
+
+Once uploads worked, the rest was about making the bot behave like something you'd actually want to use. A `/stop` command that kills the process outright with SIGKILL, instead of politely asking a stuck download to wrap up. A proper download queue, so multiple requests don't collide. Progress updates, so a slow download doesn't look like a dead one. And a fix for a format selector bug that was stripping audio from VP9 and Facebook video specifically.
+
+**The TikTok bug**
+
+This one was the strangest. Some TikTok downloads came back completely silent, no audio at all, but only sometimes. The cause turned out to be CDN-mirrored format variants reporting audio codec metadata that wasn't true, so yt-dlp thought it was grabbing audio when it wasn't. I fixed it by running ffprobe after every download to actually verify what came through, and when it caught a mismatch, falling back to muxing the watermarked audio onto the clean video track with ffmpeg's stream mapping. Not elegant, but it works, and it means the bot checks its own output instead of trusting the source blindly.
+
+**Keeping the environment from breaking things**
+
+Termux upgraded Python from 3.13 to 3.14 at some point and quietly broke yt-dlp's pip shebang in the process, which is the kind of failure that has nothing to do with your code and everything to do with the ground shifting under it. Worth remembering that a chunk of maintaining this bot isn't the bot itself, it's keeping up with an environment that changes without asking first.

@@ -1,41 +1,46 @@
 ---
 title: "Heuristic Risk Scoring for Smart Contracts"
-summary: "An evaluation of heuristic-based approaches to pre-transaction contract risk scoring across EVM and Solana."
-topic: "Blockchain"
-date: "2026-06-28"
+description: "An evaluation of heuristic-based approaches to pre-transaction contract risk scoring across EVM and Solana, built on lessons from Contrax."
+date: "2026-07-29"
+category: "Blockchain"
+tags: ["Solidity", "Solana", "Security"]
 ---
 
-## Introduction
+**Introduction**
 
-This research examines the effectiveness of heuristic-based risk scoring for smart contracts, using Contrax as the primary test implementation across EVM and Solana chains.
+This piece looks at how well heuristic-based risk scoring actually holds up for smart contracts, using Contrax, a Telegram bot that analyzes EVM contracts through Etherscan and Solana contracts through Helius's DAS API, as the real-world test case. Contrax wasn't built as a research project first. It became one after enough contradictions in its own output forced a harder look at what heuristic scoring can and can't promise.
 
-## Background
+**Background**
 
-Most existing contract-safety tools rely on either static analysis of verified source code or crowd-sourced blocklists, both of which fail for freshly deployed, unverified contracts.
+Most contract-safety tools lean on one of two things: static analysis of verified source code, or crowd-sourced blocklists built from what other people have already flagged. Both fall apart at the exact moment they matter most, right after deployment, before source is verified and before anyone's had time to report anything. That gap is where Contrax was built to operate, and it's also where heuristic scoring has to earn its keep or admit it can't.
 
-## Objectives
+**Objectives**
 
-- Identify signals available before source verification exists.
-- Evaluate false-positive and false-negative rates for common heuristics.
-- Determine which signals generalize across EVM and Solana.
+- Identify which signals are even available before source verification exists.
+- Evaluate false-positive and false-negative rates for the heuristics currently in use.
+- Determine which signals hold up across both EVM and Solana, and which don't translate at all.
 
-## Methodology
+**Methodology**
 
-A set of 12 heuristics — ownership renouncement, mint authority, liquidity lock status, and holder concentration among them — were applied to a sample of 250 contracts with known outcomes, split evenly between EVM and Solana.
+Twelve heuristics went into the evaluation: ownership renouncement, mint authority, liquidity lock status, and holder concentration among them, alongside checks Contrax already runs in production, like proxy risk detection and honeypot simulation through honeypot.is. These were applied to 250 contracts with known outcomes, split evenly between EVM and Solana chains. Getting to that sample size wasn't clean. Building Contrax's classification logic meant fixing real misclassification bugs along the way, cases where NFTs got flagged as tokens and vice versa, plus handling `supportsInterface` calls that revert instead of returning cleanly, which throws off detection if you're not catching it explicitly.
 
-## Results
+**Results**
 
-Ownership and mint-authority signals produced the lowest false-positive rates on EVM. Solana's account model required different equivalents, since there is no direct analog to contract ownership.
+Ownership and mint-authority signals came out with the lowest false-positive rates on the EVM side, which tracks with how central those concepts are to EVM contract design. Solana was a different story. Its account model has no direct equivalent to contract ownership, so the heuristics had to be rebuilt around Solana-native concepts like mint and freeze authority instead of ported over as-is. Treating the two chains as interchangeable would have quietly wrecked the results.
 
-## Discussion
+Etherscan's rate limits added their own noise during testing, silent failures that looked like clean "no risk found" results if you weren't watching for them closely. That got fixed with a proper 4 req/sec token-bucket throttle, but it's worth flagging here because it's exactly the kind of infrastructure problem that can masquerade as a heuristic problem if you're not careful about telling the two apart.
 
-No single heuristic was reliable enough to stand alone. Combining signals into a reported set, rather than a collapsed score, produced results users trusted more in informal testing.
+**Discussion**
 
-## Conclusion
+No single heuristic held up well enough to stand alone, not on either chain. What actually worked was reporting signals individually instead of collapsing them into one score. Two contracts landing on the same composite number could carry completely different risk profiles, one flagged for mint authority, another for proxy risk, and burying that distinction inside a single figure did more harm than good. In informal testing, people trusted the individual-signal output more, probably because it's honest about where its confidence actually comes from instead of pretending to a precision it doesn't have.
 
-Heuristic scoring is a useful first line of defense, but should be presented as a set of individual, inspectable signals rather than a single confidence number.
+The same logic applies to what a scanner doesn't know. Marking something unknown when it can't be confidently evaluated turned out to matter more than getting every signal right. A tool that admits its blind spots is easier to trust than one that always returns an answer, even a wrong one.
 
-## References
+**Conclusion**
+
+Heuristic scoring is a genuinely useful first line of defense, especially in the window before source verification exists and blocklists have caught up. But it earns trust by being presented as a set of individual, inspectable signals, not a single confidence number dressed up to look more certain than it is. That's the direction Contrax has moved toward, and testing here backs up why.
+
+**References**
 
 - Public RPC documentation for EVM and Solana chains.
-- Internal test results from the Contrax scanning engine.
+- Internal test results from the Contrax scanning engine, including the 250-contract sample and associated bug-fix history.
