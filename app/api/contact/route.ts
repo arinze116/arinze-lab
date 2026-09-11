@@ -21,45 +21,66 @@ export async function POST(req: NextRequest) {
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid request body." },
+      { status: 400 },
+    );
   }
 
-  const { name, email, subject, message } = body;
+  const name = typeof body.name === "string" ? body.name.trim() : "";
+  const email = typeof body.email === "string" ? body.email.trim() : "";
+  const subject = typeof body.subject === "string" ? body.subject.trim() : "";
+  const message = typeof body.message === "string" ? body.message.trim() : "";
 
   if (!name || !email || !subject || !message) {
-    return NextResponse.json({ error: "All fields are required." }, { status: 400 });
+    return NextResponse.json(
+      { error: "All fields are required." },
+      { status: 400 },
+    );
+  }
+
+  if (name.length > 120 || subject.length > 200) {
+    return NextResponse.json(
+      { error: "Name or subject is too long." },
+      { status: 400 },
+    );
   }
 
   if (!isValidEmail(email)) {
-    return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
+    return NextResponse.json(
+      { error: "Please enter a valid email address." },
+      { status: 400 },
+    );
   }
 
   if (message.length < 20) {
     return NextResponse.json(
       { error: "Your message must be at least 20 characters." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   if (message.length > 3000) {
     return NextResponse.json(
       { error: "Your message cannot exceed 3000 characters." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   if (!process.env.RESEND_API_KEY) {
-    console.error("RESEND_API_KEY is missing — check .env.local and restart the dev server.");
+    console.error(
+      "RESEND_API_KEY is missing — check .env.local and restart the dev server.",
+    );
     return NextResponse.json(
       { error: "Something went wrong. Please try again later." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
   try {
     const resend = new Resend(process.env.RESEND_API_KEY);
 
-    const { data, error } = await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: "Arinze Lab <onboarding@resend.dev>",
       to: "arinzelabs@gmail.com",
       replyTo: email,
@@ -71,18 +92,16 @@ export async function POST(req: NextRequest) {
       console.error("Resend returned an error:", error);
       return NextResponse.json(
         { error: "Something went wrong. Please try again later." },
-        { status: 500 }
+        { status: 500 },
       );
     }
-
-    console.log("Contact email sent:", data);
 
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("Contact form send failed:", err);
     return NextResponse.json(
       { error: "Something went wrong. Please try again later." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -19,24 +19,22 @@ export default function PrivacyPolicyPage() {
       <div className="prose-article mt-8">
         <p>
           This website collects minimal information necessary to respond to
-          contact form submissions and to understand aggregate visitor
-          behavior through privacy-respecting analytics.
+          contact form submissions and to understand aggregate visitor behavior
+          through privacy-respecting analytics.
         </p>
         <h2>Contact Form</h2>
         <p>
           When you submit the contact form, your name, email address, and
-          message are used solely to respond to your inquiry. This
-          information is not sold or shared with third parties.
+          message are used solely to respond to your inquiry. This information
+          is not sold or shared with third parties.
         </p>
         <h2>Analytics</h2>
         <p>
-          Aggregate, anonymized analytics may be collected to understand
-          which pages and projects are most useful to visitors.
+          Aggregate, anonymized analytics may be collected to understand which
+          pages and projects are most useful to visitors.
         </p>
         <h2>Contact</h2>
-        <p>
-          Questions about this policy can be sent to arinzelabs@gmail.com.
-        </p>
+        <p>Questions about this policy can be sent to arinzelabs@gmail.com.</p>
       </div>
     </section>
   );

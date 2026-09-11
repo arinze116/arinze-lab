@@ -16,7 +16,7 @@ export function ResearchCard({ paper }: { paper: ResearchMeta }) {
   return (
     <Card className="flex flex-col gap-3 p-5">
       <div className="flex items-center justify-between">
-        <Badge>{paper.topic}</Badge>
+        <Badge>{paper.topic || paper.category || "Research"}</Badge>
         <span className="text-xs text-[var(--color-text-secondary)]">
           {paper.readingTime}
         </span>

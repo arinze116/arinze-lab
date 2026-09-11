@@ -1,192 +1,182 @@
-import Image from "next/image";
-import { Github, Linkedin, Twitter, Mail, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProjectCard } from "@/components/ui/project-card";
 import { WritingCard } from "@/components/ui/writing-card";
 import { ResearchCard } from "@/components/ui/research-card";
-import { Badge } from "@/components/ui/badge";
-import { getFeaturedProjects, getAllWriting, getAllResearch } from "@/lib/content";
-import { siteConfig } from "@/lib/site";
-
-const skillGroups = [
-  { category: "Languages", items: ["Python", "TypeScript", "JavaScript", "Solidity"] },
-  { category: "Frameworks", items: ["Next.js", "Node.js", "Express", "Telegraf"] },
-  { category: "Databases", items: ["PostgreSQL", "Firebase", "Supabase"] },
-  { category: "Tools", items: ["Git", "Docker", "VS Code", "Linux", "Termux"] },
+import {
+  getAllResearch,
+  getAllWriting,
+  getFeaturedProjects,
+} from "@/lib/content";
+const focus = [
+  "Software systems",
+  "Security research",
+  "Automation & AI",
+  "Web3 tooling",
 ];
-
 export default function HomePage() {
   const projects = getFeaturedProjects();
-  const writing = getAllWriting().slice(0, 3);
-  const research = getAllResearch().slice(0, 3);
-
+  const writing = getAllWriting().slice(0, 2);
+  const research = getAllResearch().slice(0, 1);
   return (
     <>
-      {/* Hero */}
-      <section className="mx-auto max-w-[1280px] px-5 py-20 md:px-8 md:py-32">
-        <div className="grid items-center gap-12 md:grid-cols-2">
+      <section className="rule-grid border-b border-[var(--color-border)]">
+        <div className="page-shell grid min-h-[580px] content-center gap-10 md:grid-cols-[1.5fr_.75fr] md:gap-20">
           <div>
-            <h1 className="text-4xl font-bold leading-tight tracking-tight md:text-5xl">
-              Building thoughtful software and sharing the journey behind it.
+            <p className="eyebrow">Arinze Chinweuba / Nigeria</p>
+            <h1 className="mt-5 max-w-4xl text-5xl font-bold leading-[.98] tracking-[-.055em] md:text-7xl">
+              Software developer.
+              <br />
+              Security researcher.
+              <br />
+              <span className="text-[var(--color-text-secondary)]">
+                Builder.
+              </span>
             </h1>
-            <p className="mt-6 max-w-lg text-lg text-[var(--color-text-secondary)]">
-              I&apos;m Arinze, a software developer and researcher. Arinze Lab is
-              where I showcase my work, document ideas, and share what I learn
-              through building.
+            <p className="mt-7 max-w-xl text-base leading-7 text-[var(--color-text-secondary)] md:text-lg">
+              I design practical software, investigate security problems, and
+              build automation that earns its place in the workflow.
             </p>
-            <div className="mt-8 flex flex-wrap gap-4">
-              <Button href="/projects" variant="primary">
-                View Projects
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button href="/projects">
+                View work <ArrowUpRight size={15} />
               </Button>
-              <Button href="/contact" variant="secondary">
-                Contact Me
+              <Button href="/resume" variant="secondary">
+                View resume
+              </Button>
+              <Button href="/contact" variant="text">
+                Get in touch
               </Button>
             </div>
-            <div className="mt-10 flex items-center gap-5">
-              <a href={siteConfig.socials.github} target="_blank" rel="noreferrer" aria-label="GitHub" className="text-[var(--color-text-secondary)] hover:text-white transition-colors">
-                <Github size={20} />
-              </a>
-              <a href={siteConfig.socials.linkedin} target="_blank" rel="noreferrer" aria-label="LinkedIn" className="text-[var(--color-text-secondary)] hover:text-white transition-colors">
-                <Linkedin size={20} />
-              </a>
-              <a href={siteConfig.socials.x} target="_blank" rel="noreferrer" aria-label="X" className="text-[var(--color-text-secondary)] hover:text-white transition-colors">
-                <Twitter size={20} />
-              </a>
-              <a href={`mailto:${siteConfig.email}`} aria-label="Email" className="text-[var(--color-text-secondary)] hover:text-white transition-colors">
-                <Mail size={20} />
-              </a>
+          </div>
+          <aside className="border-l border-[var(--color-border)] pl-5 md:self-end">
+            <p className="eyebrow">Current direction</p>
+            <p className="mt-3 text-lg leading-7">
+              Open to software engineering, security, automation, and Web3
+              opportunities.
+            </p>
+            <div className="mt-8 space-y-3">
+              {focus.map((item, index) => (
+                <div
+                  key={item}
+                  className="flex items-center gap-3 border-t border-[var(--color-border)] pt-3 font-mono text-xs text-[var(--color-text-secondary)]"
+                >
+                  <span>0{index + 1}</span>
+                  <span>{item}</span>
+                </div>
+              ))}
             </div>
-          </div>
-          <div className="relative mx-auto aspect-square w-full max-w-sm overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface)]">
-            <Image
-              src="/images/portrait.svg"
-              alt="Portrait of Arinze"
-              fill
-              className="object-cover"
-              priority
-            />
-          </div>
+          </aside>
         </div>
       </section>
-
-      {/* Featured Projects */}
-      <section className="mx-auto max-w-[1280px] px-5 py-16 md:px-8">
-        <div className="mb-8 flex items-end justify-between">
+      <section className="page-shell">
+        <div className="flex items-end justify-between gap-6">
           <div>
-            <h2 className="text-2xl font-semibold md:text-3xl">Featured Projects</h2>
-            <p className="mt-2 text-[var(--color-text-secondary)]">
-              A selection of things I&apos;ve built recently.
-            </p>
+            <p className="eyebrow">Selected work</p>
+            <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
+              Projects built around real constraints.
+            </h2>
           </div>
-          <Button href="/projects" variant="text" className="hidden md:inline-flex">
-            View All Projects <ArrowUpRight size={14} />
+          <Button
+            href="/projects"
+            variant="text"
+            className="hidden md:inline-flex"
+          >
+            All work <ArrowUpRight size={15} />
           </Button>
         </div>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-10 grid gap-4 md:grid-cols-3">
           {projects.map((project) => (
             <ProjectCard key={project.slug} project={project} />
           ))}
         </div>
-        <div className="mt-8 md:hidden">
-          <Button href="/projects" variant="secondary">
-            View All Projects
-          </Button>
-        </div>
+        <Button href="/projects" variant="secondary" className="mt-6 md:hidden">
+          All work
+        </Button>
       </section>
-
-      {/* About Preview */}
-      <section className="mx-auto max-w-[1280px] px-5 py-16 md:px-8">
-        <div className="grid items-center gap-12 rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-8 md:grid-cols-[240px_1fr] md:p-12">
-          <div className="relative mx-auto aspect-square w-40 overflow-hidden rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] md:w-full">
-            <Image src="/images/portrait-square.svg" alt="Arinze" fill className="object-cover" />
-          </div>
+      <section className="border-y border-[var(--color-border)] bg-[var(--color-bg-secondary)]">
+        <div className="page-shell grid gap-10 md:grid-cols-[.7fr_1.3fr]">
           <div>
-            <h2 className="text-2xl font-semibold">About</h2>
-            <p className="mt-4 max-w-2xl text-[var(--color-text-secondary)]">
-              I&apos;m a developer based in Enugu, working across
-              full-stack web development, Web3 infrastructure, Telegram bots,
-              and security. Over the past few years I&apos;ve shipped
-              products end-to-end, from idea through deployment, often
-              hosting and testing them from a single phone running Termux.
-            </p>
-            <p className="mt-4 max-w-2xl text-[var(--color-text-secondary)]">
-              My focus areas right now are Web3 tooling, developer
-              automation, and applied AI.
-            </p>
-            <Button href="/about" variant="text" className="mt-6">
-              Read More <ArrowUpRight size={14} />
-            </Button>
+            <p className="eyebrow">Technical focus</p>
+            <h2 className="mt-3 text-3xl font-bold tracking-tight">
+              Useful systems over impressive-looking demos.
+            </h2>
           </div>
-        </div>
-      </section>
-
-      {/* Skills */}
-      <section className="mx-auto max-w-[1280px] px-5 py-16 md:px-8">
-        <h2 className="text-2xl font-semibold md:text-3xl">Skills & Technologies</h2>
-        <div className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {skillGroups.map((group) => (
-            <div key={group.category}>
-              <h3 className="text-sm font-semibold text-[var(--color-text-secondary)]">
-                {group.category}
-              </h3>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {group.items.map((item) => (
-                  <Badge key={item}>{item}</Badge>
-                ))}
+          <div className="grid gap-px bg-[var(--color-border)] sm:grid-cols-2">
+            {focus.map((item, index) => (
+              <div key={item} className="bg-[var(--color-bg-secondary)] p-5">
+                <p className="font-mono text-xs text-[var(--color-text-faint)]">
+                  0{index + 1}
+                </p>
+                <p className="mt-8 text-lg font-semibold">{item}</p>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+      <section className="page-shell grid gap-12 lg:grid-cols-2">
+        <div>
+          <div className="flex items-end justify-between">
+            <div>
+              <p className="eyebrow">Engineering notes</p>
+              <h2 className="mt-3 text-2xl font-bold">
+                Writing from the work.
+              </h2>
             </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Writing */}
-      <section className="mx-auto max-w-[1280px] px-5 py-16 md:px-8">
-        <div className="mb-8 flex items-end justify-between">
-          <h2 className="text-2xl font-semibold md:text-3xl">Writing</h2>
-          <Button href="/writing" variant="text" className="hidden md:inline-flex">
-            View All <ArrowUpRight size={14} />
-          </Button>
-        </div>
-        <div className="grid gap-6 md:grid-cols-3">
-          {writing.map((post) => (
-            <WritingCard key={post.slug} post={post} />
-          ))}
-        </div>
-      </section>
-
-      {/* Research */}
-      <section className="mx-auto max-w-[1280px] px-5 py-16 md:px-8">
-        <div className="mb-8 flex items-end justify-between">
-          <h2 className="text-2xl font-semibold md:text-3xl">Research</h2>
-          <Button href="/research" variant="text" className="hidden md:inline-flex">
-            View All <ArrowUpRight size={14} />
-          </Button>
-        </div>
-        <div className="grid gap-6 md:grid-cols-3">
-          {research.map((paper) => (
-            <ResearchCard key={paper.slug} paper={paper} />
-          ))}
-        </div>
-      </section>
-
-      {/* Contact CTA */}
-      <section className="mx-auto max-w-[1280px] px-5 py-24 md:px-8">
-        <div className="rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-10 text-center md:p-16">
-          <h2 className="text-3xl font-semibold md:text-4xl">
-            Interested in working together?
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl text-[var(--color-text-secondary)]">
-            Whether you have a project, an opportunity, or simply want to
-            connect, I&apos;d love to hear from you.
-          </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-            <Button href="/contact" variant="primary">
-              Contact Me
-            </Button>
-            <Button href={`mailto:${siteConfig.email}`} variant="secondary">
-              Email Me
+            <Button href="/writing" variant="text">
+              All <ArrowUpRight size={15} />
             </Button>
           </div>
+          <div className="mt-7 grid gap-4">
+            {writing.map((post) => (
+              <WritingCard key={post.slug} post={post} />
+            ))}
+          </div>
+        </div>
+        <div>
+          <div className="flex items-end justify-between">
+            <div>
+              <p className="eyebrow">Research</p>
+              <h2 className="mt-3 text-2xl font-bold">
+                Questions worth testing.
+              </h2>
+            </div>
+            <Button href="/research" variant="text">
+              All <ArrowUpRight size={15} />
+            </Button>
+          </div>
+          <div className="mt-7">
+            {research.map((paper) => (
+              <ResearchCard key={paper.slug} paper={paper} />
+            ))}
+          </div>
+          <div className="mt-4 border border-[var(--color-border)] p-5">
+            <p className="eyebrow">Working now</p>
+            <p className="mt-3 leading-7 text-[var(--color-text-secondary)]">
+              Expanding contract-risk tooling and continuing to make developer
+              automation more reliable under constrained infrastructure.
+            </p>
+            <Button href="/now" variant="text" className="mt-5">
+              What I’m doing now <ArrowUpRight size={15} />
+            </Button>
+          </div>
+        </div>
+      </section>
+      <section className="page-shell pt-0">
+        <div className="border border-[var(--color-border)] p-7 md:flex md:items-end md:justify-between md:p-10">
+          <div>
+            <p className="eyebrow">Opportunities</p>
+            <h2 className="mt-3 text-3xl font-bold tracking-tight">
+              Have a difficult problem to solve?
+            </h2>
+            <p className="mt-3 max-w-2xl text-[var(--color-text-secondary)]">
+              I’m open to thoughtful conversations about engineering, security,
+              AI automation, and Web3 work.
+            </p>
+          </div>
+          <Button href="/contact" className="mt-6 md:mt-0">
+            Start a conversation <ArrowUpRight size={15} />
+          </Button>
         </div>
       </section>
     </>

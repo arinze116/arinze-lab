@@ -8,12 +8,17 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { JsonLd } from "@/components/json-ld";
 import { softwareApplicationSchema, breadcrumbSchema } from "@/lib/schema";
+import { ContentRenderer } from "@/components/ui/content-renderer";
 
 export function generateStaticParams() {
   return getAllProjects().map((p) => ({ slug: p.slug }));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
   const { slug } = await params;
   try {
     const { meta } = getProjectBySlug(slug);
@@ -41,24 +46,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
 }
 
-// Minimal MDX-body renderer: splits by "## " headings into sections.
-function renderContent(content: string) {
-  const blocks = content.trim().split(/\n(?=## )/);
-  return blocks.map((block, i) => {
-    const [headingLine, ...rest] = block.split("\n");
-    const heading = headingLine.replace(/^##\s*/, "");
-    const body = rest.join("\n").trim();
-    return (
-      <div key={i} className="mb-8">
-        <h2 className="text-xl font-semibold">{heading}</h2>
-        <p className="mt-3 whitespace-pre-line text-[var(--color-text-secondary)]">
-          {body}
-        </p>
-      </div>
-    );
-  });
-}
-
 export default async function ProjectDetailPage({
   params,
 }: {
@@ -74,11 +61,15 @@ export default async function ProjectDetailPage({
   const { meta, content } = data!;
   const allProjects = getAllProjects();
   const related = allProjects
-    .filter((p) => p.slug !== meta.slug && p.categories.some((c) => meta.categories.includes(c)))
+    .filter(
+      (p) =>
+        p.slug !== meta.slug &&
+        p.categories.some((c) => meta.categories.includes(c)),
+    )
     .slice(0, 2);
 
   return (
-    <article className="mx-auto max-w-[880px] px-5 py-16 md:px-8">
+    <article className="mx-auto max-w-[960px] px-5 py-16 md:px-8">
       <JsonLd
         data={[
           softwareApplicationSchema({
@@ -94,15 +85,21 @@ export default async function ProjectDetailPage({
           ]),
         ]}
       />
-      <Link href="/projects/" className="inline-flex items-center gap-1 text-sm text-[var(--color-text-secondary)] hover:text-white">
+      <Link
+        href="/projects"
+        className="inline-flex items-center gap-1 text-sm text-[var(--color-text-secondary)] hover:text-white"
+      >
         <ArrowLeft size={14} /> Back to Projects
       </Link>
 
-      <div className="mt-6 flex items-start justify-between gap-4">
+      <p className="eyebrow mt-8">Project case study / {meta.year}</p>
+      <div className="mt-3 flex items-start justify-between gap-4">
         <h1 className="text-3xl font-bold md:text-4xl">{meta.title}</h1>
         <Badge status>{meta.status}</Badge>
       </div>
-      <p className="mt-4 text-lg text-[var(--color-text-secondary)]">{meta.summary}</p>
+      <p className="mt-4 text-lg text-[var(--color-text-secondary)]">
+        {meta.summary}
+      </p>
 
       <div className="mt-4 flex flex-wrap gap-2">
         {meta.stack.map((tech) => (
@@ -111,7 +108,12 @@ export default async function ProjectDetailPage({
       </div>
 
       <div className="relative mt-8 aspect-[16/9] w-full overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface)]">
-        <Image src={meta.cover} alt={`${meta.title} cover`} fill className="object-cover" />
+        <Image
+          src={meta.cover}
+          alt={`${meta.title} cover`}
+          fill
+          className="object-cover"
+        />
       </div>
 
       <div className="mt-10 flex flex-wrap gap-4">
@@ -132,14 +134,20 @@ export default async function ProjectDetailPage({
         )}
       </div>
 
-      <div className="prose-article mt-12">{renderContent(content)}</div>
+      <div className="prose-article mt-12 max-w-3xl">
+        <ContentRenderer content={content} />
+      </div>
 
       {related.length > 0 && (
         <div className="mt-16 border-t border-[var(--color-border)] pt-8">
           <h2 className="text-lg font-semibold">Related Projects</h2>
           <div className="mt-4 flex flex-col gap-2">
             {related.map((p) => (
-              <Link key={p.slug} href={`/projects/${p.slug}`} className="text-[var(--color-accent)] hover:underline underline-offset-4">
+              <Link
+                key={p.slug}
+                href={`/projects/${p.slug}`}
+                className="text-[var(--color-accent)] hover:underline underline-offset-4"
+              >
                 {p.title}
               </Link>
             ))}

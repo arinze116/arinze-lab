@@ -4,11 +4,13 @@ import { ProjectsExplorer } from "@/components/sections/projects-explorer";
 
 export const metadata: Metadata = {
   title: "Projects",
-  description: "A showcase of software Arinze has designed, built, and shipped.",
+  description:
+    "A showcase of software Arinze has designed, built, and shipped.",
   alternates: { canonical: "/projects" },
   openGraph: {
     title: "Projects",
-    description: "A showcase of software Arinze has designed, built, and shipped.",
+    description:
+      "A showcase of software Arinze has designed, built, and shipped.",
     url: "/projects",
     type: "website",
   },
@@ -17,10 +19,14 @@ export const metadata: Metadata = {
 export default function ProjectsPage() {
   const projects = getAllProjects();
   return (
-    <section className="mx-auto max-w-[1280px] px-5 py-16 md:px-8">
-      <h1 className="text-3xl font-bold md:text-4xl">Projects</h1>
-      <p className="mt-3 max-w-xl text-[var(--color-text-secondary)]">
-        A showcase of software I&apos;ve designed, built, and shipped.
+    <section className="page-shell">
+      <p className="eyebrow">Selected systems & experiments</p>
+      <h1 className="mt-3 text-4xl font-bold tracking-tight md:text-5xl">
+        Work that holds up under use.
+      </h1>
+      <p className="mt-4 max-w-2xl leading-7 text-[var(--color-text-secondary)]">
+        Software, automation, and security tooling built from the problem
+        outward.
       </p>
       <div className="mt-10">
         <ProjectsExplorer projects={projects} />

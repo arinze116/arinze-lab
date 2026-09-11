@@ -1,4 +1,8 @@
-export type ProjectStatus = "Live" | "In Progress" | "Archived" | "Experimental";
+export type ProjectStatus =
+  | "Live"
+  | "In Progress"
+  | "Archived"
+  | "Experimental";
 
 export interface ProjectMeta {
   slug: string;
@@ -24,6 +28,8 @@ export interface WritingMeta {
   readingTime: string;
   tags: string[];
   featuredImage?: string;
+  summary?: string;
+  topic?: string;
 }
 
 export interface ResearchMeta {
@@ -33,4 +39,7 @@ export interface ResearchMeta {
   topic: string;
   date: string;
   readingTime: string;
+  description?: string;
+  category?: string;
+  tags?: string[];
 }

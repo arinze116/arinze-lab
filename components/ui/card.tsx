@@ -9,7 +9,7 @@ export function Card({
 }) {
   return (
     <div
-      className={`rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-bg-secondary)] transition-all duration-200 hover:-translate-y-1 hover:border-[var(--color-text-secondary)]/40 ${className}`}
+      className={`rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-bg-secondary)] transition-colors duration-200 hover:border-[var(--color-text-secondary)]/60 ${className}`}
     >
       {children}
     </div>

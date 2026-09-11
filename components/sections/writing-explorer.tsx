@@ -4,17 +4,20 @@ import { useMemo, useState } from "react";
 import { WritingCard } from "@/components/ui/writing-card";
 import { WritingMeta } from "@/types/content";
 
-const categories = ["All", "Development", "Flutter", "Next.js", "Python", "AI", "Career", "Opinion", "Blockchain"];
-
 export function WritingExplorer({ posts }: { posts: WritingMeta[] }) {
   const [active, setActive] = useState("All");
   const [query, setQuery] = useState("");
+  const categories = [
+    "All",
+    ...Array.from(new Set(posts.map((post) => post.category))).sort(),
+  ];
 
   const filtered = useMemo(() => {
     return posts.filter((p) => {
       const matchesCategory = active === "All" || p.category === active;
       const matchesQuery =
-        query.trim() === "" || p.title.toLowerCase().includes(query.toLowerCase());
+        query.trim() === "" ||
+        p.title.toLowerCase().includes(query.toLowerCase());
       return matchesCategory && matchesQuery;
     });
   }, [posts, active, query]);
@@ -24,6 +27,7 @@ export function WritingExplorer({ posts }: { posts: WritingMeta[] }) {
       <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <input
           type="text"
+          aria-label="Search articles"
           placeholder="Search articles..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -33,6 +37,8 @@ export function WritingExplorer({ posts }: { posts: WritingMeta[] }) {
           {categories.map((c) => (
             <button
               key={c}
+              type="button"
+              aria-pressed={active === c}
               onClick={() => setActive(c)}
               className={`rounded-[var(--radius-badge)] border px-3 py-1.5 text-xs font-medium transition-colors ${
                 active === c
@@ -60,4 +66,3 @@ export function WritingExplorer({ posts }: { posts: WritingMeta[] }) {
     </>
   );
 }
-

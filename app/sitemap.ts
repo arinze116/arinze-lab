@@ -14,7 +14,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/research", priority: 0.8, changeFrequency: "monthly" as const },
     { path: "/now", priority: 0.6, changeFrequency: "weekly" as const },
     { path: "/contact", priority: 0.7, changeFrequency: "yearly" as const },
-    { path: "/privacy-policy", priority: 0.3, changeFrequency: "yearly" as const },
+    { path: "/resume", priority: 0.8, changeFrequency: "monthly" as const },
+    {
+      path: "/privacy-policy",
+      priority: 0.3,
+      changeFrequency: "yearly" as const,
+    },
   ].map((r) => ({
     url: `${SITE_URL}${r.path}`,
     lastModified: now,
@@ -43,5 +48,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...staticRoutes, ...projectRoutes, ...writingRoutes, ...researchRoutes];
+  return [
+    ...staticRoutes,
+    ...projectRoutes,
+    ...writingRoutes,
+    ...researchRoutes,
+  ];
 }

@@ -1,13 +1,13 @@
 import { ReactNode } from "react";
 
 const statusColors: Record<string, string> = {
-  Live: "text-[var(--color-success)] border-[var(--color-success)]/30 bg-[var(--color-success)]/10",
+  Live: "text-[var(--color-text-primary)] border-[var(--color-text-primary)]/40 bg-white/5",
   "In Progress":
-    "text-[var(--color-warning)] border-[var(--color-warning)]/30 bg-[var(--color-warning)]/10",
-  Archived:
     "text-[var(--color-text-secondary)] border-[var(--color-border)] bg-[var(--color-surface)]",
+  Archived:
+    "text-[var(--color-text-faint)] border-[var(--color-border)] bg-[var(--color-surface)]",
   Experimental:
-    "text-[var(--color-accent)] border-[var(--color-accent)]/30 bg-[var(--color-accent)]/10",
+    "text-[var(--color-text-secondary)] border-[var(--color-border)] bg-[var(--color-surface)]",
 };
 
 export function Badge({

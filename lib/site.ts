@@ -8,21 +8,19 @@ export const siteConfig = {
   authorName: "Arinze Chinweuba",
   url: SITE_URL,
   description:
-    "A portfolio documenting my work, projects, research, and technical writing.",
+    "Software engineering, security research, automation, and technical writing by Arinze Chinweuba.",
   email: "arinzelabs@gmail.com",
   location: "Nigeria",
   socials: {
     github: "https://github.com/arinze116",
     linkedin: "https://linkedin.com/in/arinze-chinweuba",
-    x: "https://x.com/arinze116"
+    x: "https://x.com/arinze116",
   },
 };
 
 export const navItems = [
-  { label: "About", href: "/about" },
-  { label: "Projects", href: "/projects" },
+  { label: "Work", href: "/projects" },
   { label: "Writing", href: "/writing" },
   { label: "Research", href: "/research" },
-  { label: "Now", href: "/now" },
-  { label: "Contact", href: "/contact" },
+  { label: "About", href: "/about" },
 ];

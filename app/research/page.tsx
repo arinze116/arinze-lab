@@ -4,11 +4,13 @@ import { ResearchCard } from "@/components/ui/research-card";
 
 export const metadata: Metadata = {
   title: "Research",
-  description: "Deeper technical explorations, experiments, and long-form analysis.",
+  description:
+    "Deeper technical explorations, experiments, and long-form analysis.",
   alternates: { canonical: "/research" },
   openGraph: {
     title: "Research",
-    description: "Deeper technical explorations, experiments, and long-form analysis.",
+    description:
+      "Deeper technical explorations, experiments, and long-form analysis.",
     url: "/research",
     type: "website",
   },
@@ -17,11 +19,14 @@ export const metadata: Metadata = {
 export default function ResearchPage() {
   const papers = getAllResearch();
   return (
-    <section className="mx-auto max-w-[1280px] px-5 py-16 md:px-8">
-      <h1 className="text-3xl font-bold md:text-4xl">Research</h1>
-      <p className="mt-3 max-w-xl text-[var(--color-text-secondary)]">
-        Deeper technical explorations, experiments, documentation, and
-        long-form analysis.
+    <section className="page-shell">
+      <p className="eyebrow">Investigations & experiments</p>
+      <h1 className="mt-3 text-4xl font-bold tracking-tight md:text-5xl">
+        Research with its assumptions visible.
+      </h1>
+      <p className="mt-4 max-w-2xl leading-7 text-[var(--color-text-secondary)]">
+        Longer technical analysis, methodology, and findings from software and
+        security work.
       </p>
       <div className="mt-10">
         {papers.length === 0 ? (

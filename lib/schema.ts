@@ -74,8 +74,14 @@ export function articleSchema(input: {
     datePublished: input.datePublished,
     dateModified: input.datePublished,
     inLanguage: "en",
-    image: input.image ? `${SITE_URL}${input.image}` : `${SITE_URL}/opengraph-image`,
-    author: { "@type": "Person", "@id": `${SITE_URL}/#person`, name: siteConfig.authorName },
+    image: input.image
+      ? `${SITE_URL}${input.image}`
+      : `${SITE_URL}/opengraph-image`,
+    author: {
+      "@type": "Person",
+      "@id": `${SITE_URL}/#person`,
+      name: siteConfig.authorName,
+    },
     publisher: { "@id": `${SITE_URL}/#person` },
   };
 }
@@ -98,7 +104,11 @@ export function softwareApplicationSchema(input: {
     image: input.image ? `${SITE_URL}${input.image}` : undefined,
     applicationCategory: input.applicationCategory ?? "DeveloperApplication",
     operatingSystem: input.operatingSystem ?? "Any",
-    author: { "@type": "Person", "@id": `${SITE_URL}/#person`, name: siteConfig.authorName },
+    author: {
+      "@type": "Person",
+      "@id": `${SITE_URL}/#person`,
+      name: siteConfig.authorName,
+    },
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
   };
 }

@@ -11,10 +11,10 @@ interface BaseProps {
 
 const variantClasses: Record<Variant, string> = {
   primary:
-    "bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-hover)] px-5 py-2.5 rounded-[var(--radius-button)]",
+    "bg-[var(--color-accent)] text-black hover:bg-[var(--color-accent-hover)] px-5 py-2.5 rounded-[var(--radius-button)]",
   secondary:
     "bg-transparent border border-[var(--color-border)] text-white hover:bg-[var(--color-bg-secondary)] px-5 py-2.5 rounded-[var(--radius-button)]",
-  text: "bg-transparent text-[var(--color-accent)] hover:underline underline-offset-4 p-0",
+  text: "bg-transparent text-[var(--color-text-primary)] hover:underline underline-offset-4 p-0",
 };
 
 const base =
@@ -26,7 +26,9 @@ export function Button({
   className = "",
   href,
   ...rest
-}: BaseProps & { href?: string } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
+}: BaseProps & {
+  href?: string;
+} & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const classes = `${base} ${variantClasses[variant]} ${className}`;
 
   if (href) {

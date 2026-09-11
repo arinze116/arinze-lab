@@ -42,7 +42,9 @@ export function ContactForm() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setServerError(data.error || "Something went wrong. Please try again later.");
+        setServerError(
+          data.error || "Something went wrong. Please try again later.",
+        );
         setStatus("error");
         return;
       }
@@ -56,10 +58,13 @@ export function ContactForm() {
 
   if (status === "success") {
     return (
-      <div className="rounded-[var(--radius-card)] border border-[var(--color-success)]/30 bg-[var(--color-success)]/10 p-6 text-center">
+      <div
+        role="status"
+        className="rounded-[var(--radius-card)] border border-[var(--color-success)]/30 bg-[var(--color-success)]/10 p-6 text-center"
+      >
         <p className="text-[var(--color-success)]">
-          Thank you for your message. I&apos;ve received it and will get back
-          to you as soon as possible.
+          Thank you for your message. I&apos;ve received it and will get back to
+          you as soon as possible.
         </p>
       </div>
     );
@@ -74,40 +79,106 @@ export function ContactForm() {
         <label htmlFor="name" className="mb-1.5 block text-sm font-medium">
           Full Name
         </label>
-        <input id="name" name="name" type="text" className={inputClass} />
-        {errors.name && <p className="mt-1.5 text-xs text-[var(--color-error)]">{errors.name}</p>}
+        <input
+          id="name"
+          name="name"
+          type="text"
+          autoComplete="name"
+          required
+          aria-invalid={Boolean(errors.name)}
+          aria-describedby={errors.name ? "name-error" : undefined}
+          className={inputClass}
+        />
+        {errors.name && (
+          <p
+            id="name-error"
+            className="mt-1.5 text-xs text-[var(--color-error)]"
+          >
+            {errors.name}
+          </p>
+        )}
       </div>
 
       <div>
         <label htmlFor="email" className="mb-1.5 block text-sm font-medium">
           Email Address
         </label>
-        <input id="email" name="email" type="email" className={inputClass} />
-        {errors.email && <p className="mt-1.5 text-xs text-[var(--color-error)]">{errors.email}</p>}
+        <input
+          id="email"
+          name="email"
+          type="email"
+          autoComplete="email"
+          required
+          aria-invalid={Boolean(errors.email)}
+          aria-describedby={errors.email ? "email-error" : undefined}
+          className={inputClass}
+        />
+        {errors.email && (
+          <p
+            id="email-error"
+            className="mt-1.5 text-xs text-[var(--color-error)]"
+          >
+            {errors.email}
+          </p>
+        )}
       </div>
 
       <div>
         <label htmlFor="subject" className="mb-1.5 block text-sm font-medium">
           Subject
         </label>
-        <input id="subject" name="subject" type="text" className={inputClass} />
-        {errors.subject && <p className="mt-1.5 text-xs text-[var(--color-error)]">{errors.subject}</p>}
+        <input
+          id="subject"
+          name="subject"
+          type="text"
+          required
+          aria-invalid={Boolean(errors.subject)}
+          aria-describedby={errors.subject ? "subject-error" : undefined}
+          className={inputClass}
+        />
+        {errors.subject && (
+          <p
+            id="subject-error"
+            className="mt-1.5 text-xs text-[var(--color-error)]"
+          >
+            {errors.subject}
+          </p>
+        )}
       </div>
 
       <div>
         <label htmlFor="message" className="mb-1.5 block text-sm font-medium">
           Message
         </label>
-        <textarea id="message" name="message" rows={6} className={inputClass} />
-        {errors.message && <p className="mt-1.5 text-xs text-[var(--color-error)]">{errors.message}</p>}
+        <textarea
+          id="message"
+          name="message"
+          rows={6}
+          required
+          aria-invalid={Boolean(errors.message)}
+          aria-describedby={errors.message ? "message-error" : undefined}
+          className={inputClass}
+        />
+        {errors.message && (
+          <p
+            id="message-error"
+            className="mt-1.5 text-xs text-[var(--color-error)]"
+          >
+            {errors.message}
+          </p>
+        )}
       </div>
 
-      {serverError && <p className="text-sm text-[var(--color-error)]">{serverError}</p>}
+      {serverError && (
+        <p role="alert" className="text-sm text-[var(--color-error)]">
+          {serverError}
+        </p>
+      )}
 
       <button
         type="submit"
         disabled={status === "submitting"}
-        className="mt-2 inline-flex items-center justify-center rounded-[var(--radius-button)] bg-[var(--color-accent)] px-5 py-3 text-sm font-medium text-white transition-colors duration-150 hover:bg-[var(--color-accent-hover)] disabled:opacity-60"
+        className="mt-2 inline-flex items-center justify-center rounded-[var(--radius-button)] bg-[var(--color-accent)] px-5 py-3 text-sm font-medium text-black transition-colors duration-150 hover:bg-[var(--color-accent-hover)] disabled:opacity-60"
       >
         {status === "submitting" ? "Sending..." : "Send Message"}
       </button>

@@ -48,10 +48,16 @@ export function getAllWriting(): WritingMeta[] {
     .map((file) => {
       const slug = file.replace(/\.mdx$/, "");
       const { data, content } = readFile("writing", slug);
+      const frontmatter = data as Partial<WritingMeta>;
       return {
         slug,
         readingTime: Math.ceil(readingTime(content).minutes) + " min read",
-        ...data,
+        ...frontmatter,
+        summary:
+          frontmatter.summary ??
+          frontmatter.description ??
+          "Technical research and investigation.",
+        topic: frontmatter.topic ?? frontmatter.category ?? "Research",
       } as WritingMeta;
     })
     .sort((a, b) => (a.date < b.date ? 1 : -1));
@@ -59,11 +65,17 @@ export function getAllWriting(): WritingMeta[] {
 
 export function getWritingBySlug(slug: string) {
   const { data, content } = readFile("writing", slug);
+  const frontmatter = data as Partial<WritingMeta>;
   return {
     meta: {
       slug,
       readingTime: Math.ceil(readingTime(content).minutes) + " min read",
-      ...data,
+      ...frontmatter,
+      summary:
+        frontmatter.summary ??
+        frontmatter.description ??
+        "Technical research and investigation.",
+      topic: frontmatter.topic ?? frontmatter.category ?? "Research",
     } as WritingMeta,
     content,
   };

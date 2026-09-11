@@ -24,15 +24,30 @@ export function renderOgImage() {
           fontFamily: "sans-serif",
         }}
       >
-        <div style={{ fontSize: 88, fontWeight: 700, color: "#ffffff", letterSpacing: "-0.02em" }}>
+        <div
+          style={{
+            fontSize: 88,
+            fontWeight: 700,
+            color: "#ffffff",
+            letterSpacing: "-0.02em",
+          }}
+        >
           {siteConfig.name}
         </div>
         <div style={{ marginTop: 24, fontSize: 40, color: "#aab0b6" }}>
           Software Developer &amp; Researcher
         </div>
-        <div style={{ marginTop: 48, height: 8, width: 180, backgroundColor: "#1d9bf0", borderRadius: 4 }} />
+        <div
+          style={{
+            marginTop: 48,
+            height: 8,
+            width: 180,
+            backgroundColor: "#1d9bf0",
+            borderRadius: 4,
+          }}
+        />
       </div>
     ),
-    { ...size }
+    { ...size },
   );
 }

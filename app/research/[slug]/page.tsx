@@ -6,12 +6,20 @@ import { getAllResearch, getResearchBySlug } from "@/lib/content";
 import { Badge } from "@/components/ui/badge";
 import { JsonLd } from "@/components/json-ld";
 import { articleSchema, breadcrumbSchema } from "@/lib/schema";
+import {
+  ContentRenderer,
+  contentHeadings,
+} from "@/components/ui/content-renderer";
 
 export function generateStaticParams() {
   return getAllResearch().map((p) => ({ slug: p.slug }));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
   const { slug } = await params;
   try {
     const { meta } = getResearchBySlug(slug);
@@ -39,21 +47,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 function formatDate(date: string) {
-  return new Date(date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
-}
-
-function renderContent(content: string) {
-  const blocks = content.trim().split(/\n(?=## )/);
-  return blocks.map((block, i) => {
-    const [headingLine, ...rest] = block.split("\n");
-    const heading = headingLine.replace(/^##\s*/, "");
-    const body = rest.join("\n").trim();
-    return (
-      <div key={i} className="mb-8">
-        <h2 className="text-xl font-semibold">{heading}</h2>
-        <p className="mt-3 whitespace-pre-line">{body}</p>
-      </div>
-    );
+  return new Date(date).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 }
 
@@ -70,9 +67,10 @@ export default async function ResearchDetailPage({
     notFound();
   }
   const { meta, content } = data!;
+  const headings = contentHeadings(content);
 
   return (
-    <article className="mx-auto max-w-[720px] px-5 py-16 md:px-8">
+    <article className="mx-auto max-w-[1080px] px-5 py-16 md:px-8">
       <JsonLd
         data={[
           articleSchema({
@@ -88,20 +86,45 @@ export default async function ResearchDetailPage({
           ]),
         ]}
       />
-      <Link href="/research" className="inline-flex items-center gap-1 text-sm text-[var(--color-text-secondary)] hover:text-white">
+      <Link
+        href="/research"
+        className="inline-flex items-center gap-1 text-sm text-[var(--color-text-secondary)] hover:text-white"
+      >
         <ArrowLeft size={14} /> Back to Research
       </Link>
 
       <div className="mt-6 flex items-center gap-3">
-        <Badge>{meta.topic}</Badge>
+        <Badge>{meta.topic || meta.category || "Research"}</Badge>
         <span className="text-xs text-[var(--color-text-secondary)]">
           {formatDate(meta.date)} · {meta.readingTime}
         </span>
       </div>
       <h1 className="mt-4 text-3xl font-bold md:text-4xl">{meta.title}</h1>
-      <p className="mt-3 text-[var(--color-text-secondary)]">{meta.summary}</p>
+      <p className="mt-3 text-[var(--color-text-secondary)]">
+        {meta.summary || meta.description}
+      </p>
 
-      <div className="prose-article mt-10">{renderContent(content)}</div>
+      <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,720px)_180px]">
+        <div className="prose-article">
+          <ContentRenderer content={content} />
+        </div>
+        {headings.length > 1 && (
+          <aside className="hidden border-l border-[var(--color-border)] pl-4 lg:block">
+            <p className="eyebrow">Research outline</p>
+            <nav className="mt-4 space-y-3">
+              {headings.map((heading) => (
+                <a
+                  key={heading.id}
+                  href={`#${heading.id}`}
+                  className="block text-xs leading-5 text-[var(--color-text-secondary)] hover:text-white"
+                >
+                  {heading.title}
+                </a>
+              ))}
+            </nav>
+          </aside>
+        )}
+      </div>
     </article>
   );
 }

@@ -1,74 +1,64 @@
 import Link from "next/link";
-import { Github, Linkedin, Twitter, Mail } from "lucide-react";
+import { Github, Linkedin, Mail } from "lucide-react";
 import { navItems, siteConfig } from "@/lib/site";
-
 export function Footer() {
-  const year = new Date().getFullYear();
-
   return (
-    <footer className="border-t border-[color:var(--color-border)]">
-      <div className="mx-auto max-w-[1280px] px-5 py-12 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
+    <footer className="border-t border-[var(--color-border)]">
+      <div className="mx-auto max-w-[1280px] px-5 py-10 md:px-8">
+        <div className="grid gap-8 md:grid-cols-[1.4fr_1fr_auto]">
           <div>
-            <div className="text-base font-semibold">{siteConfig.name}</div>
-            <p className="mt-3 max-w-xs text-sm text-[color:var(--color-text-secondary)]">
-              A portfolio documenting my work, projects, research, and
-              technical writing.
+            <p className="font-mono text-sm">{siteConfig.name}</p>
+            <p className="mt-3 max-w-sm text-sm leading-6 text-[var(--color-text-secondary)]">
+              Independent software engineering, security research, and practical
+              automation.
             </p>
           </div>
-
-          <div className="grid grid-flow-col grid-rows-3 gap-x-8 gap-y-2">
-            {navItems.map((item) => (
+          <div className="grid grid-cols-2 gap-3 text-sm text-[var(--color-text-secondary)]">
+            {[
+              ...navItems,
+              { label: "Now", href: "/now" },
+              { label: "Privacy", href: "/privacy-policy" },
+            ].map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-sm text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-text-primary)] transition-colors w-fit"
+                className="hover:text-white"
               >
                 {item.label}
               </Link>
             ))}
           </div>
-
-          <div className="flex gap-4 md:justify-end items-start">
-            <Link
+          <div className="flex gap-4 text-[var(--color-text-secondary)]">
+            <a
               href={siteConfig.socials.github}
               target="_blank"
               rel="noreferrer"
               aria-label="GitHub"
-              className="text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-text-primary)] transition-colors"
+              className="hover:text-white"
             >
               <Github size={18} />
-            </Link>
-            <Link
+            </a>
+            <a
               href={siteConfig.socials.linkedin}
               target="_blank"
               rel="noreferrer"
               aria-label="LinkedIn"
-              className="text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-text-primary)] transition-colors"
+              className="hover:text-white"
             >
               <Linkedin size={18} />
-            </Link>
-            <Link
-              href={siteConfig.socials.x}
-              target="_blank"
-              rel="noreferrer"
-              aria-label="X"
-              className="text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-text-primary)] transition-colors"
-            >
-              <Twitter size={18} />
-            </Link>
-            <Link
+            </a>
+            <a
               href={`mailto:${siteConfig.email}`}
               aria-label="Email"
-              className="text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-text-primary)] transition-colors"
+              className="hover:text-white"
             >
               <Mail size={18} />
-            </Link>
+            </a>
           </div>
         </div>
-
-        <div className="mt-10 border-t border-[color:var(--color-border)] pt-6 text-xs text-[color:var(--color-text-secondary)]">
-          © {year} {siteConfig.name}. All rights reserved.
+        <div className="mt-10 flex flex-wrap justify-between gap-2 border-t border-[var(--color-border)] pt-5 font-mono text-xs text-[var(--color-text-faint)]">
+          <span>© {new Date().getFullYear()} ArinzeLab.</span>
+          <span>Open to considered opportunities.</span>
         </div>
       </div>
     </footer>

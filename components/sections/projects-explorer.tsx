@@ -4,16 +4,27 @@ import { useMemo, useState } from "react";
 import { ProjectCard } from "@/components/ui/project-card";
 import { ProjectMeta } from "@/types/content";
 
-const filters = ["All", "Python", "Next.js", "AI", "Blockchain", "Bots"];
-
 export function ProjectsExplorer({ projects }: { projects: ProjectMeta[] }) {
   const [active, setActive] = useState("All");
   const [query, setQuery] = useState("");
+  const filters = [
+    "All",
+    ...Array.from(
+      new Set(
+        projects.flatMap((project) => [
+          ...project.categories,
+          ...project.stack,
+        ]),
+      ),
+    ).sort(),
+  ];
 
   const filtered = useMemo(() => {
     return projects.filter((p) => {
       const matchesFilter =
-        active === "All" || p.categories.includes(active) || p.stack.includes(active);
+        active === "All" ||
+        p.categories.includes(active) ||
+        p.stack.includes(active);
       const matchesQuery =
         query.trim() === "" ||
         p.title.toLowerCase().includes(query.toLowerCase()) ||
@@ -27,7 +38,8 @@ export function ProjectsExplorer({ projects }: { projects: ProjectMeta[] }) {
       <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <input
           type="text"
-          placeholder="Search projects by title or technology..."
+          aria-label="Search projects by title or technology"
+          placeholder="Search by title or technology..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="w-full max-w-sm rounded-[var(--radius-input)] border border-[var(--color-border)] bg-[var(--color-bg-secondary)] px-4 py-2.5 text-sm text-white placeholder:text-[var(--color-text-secondary)] focus-visible:outline-2 focus-visible:outline-[var(--color-accent)]"
@@ -36,6 +48,8 @@ export function ProjectsExplorer({ projects }: { projects: ProjectMeta[] }) {
           {filters.map((f) => (
             <button
               key={f}
+              type="button"
+              aria-pressed={active === f}
               onClick={() => setActive(f)}
               className={`rounded-[var(--radius-badge)] border px-3 py-1.5 text-xs font-medium transition-colors ${
                 active === f
