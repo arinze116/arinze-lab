@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { handleTelegramUpdate } from "@/lib/telegram/commands";
-// import { genericOperationId, isAuthorized, verifyWebhookSecret } from "@/lib/telegram/auth";
+import { genericOperationId, isAuthorized } from "@/lib/telegram/auth";
 import { claimUpdate } from "@/lib/telegram/idempotency";
 import type { TelegramUpdate } from "@/lib/telegram/types";
 
