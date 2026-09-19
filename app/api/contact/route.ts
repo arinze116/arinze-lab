@@ -15,8 +15,23 @@ function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+const contactRate = new Map<string, { count: number; resetAt: number }>();
+
 export async function POST(req: NextRequest) {
-  let body: ContactPayload;
+  const key = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  const now = Date.now();
+  const rate = contactRate.get(key);
+  if (!rate || rate.resetAt <= now) contactRate.set(key, { count: 1, resetAt: now + 60_000 });
+  else {
+    rate.count += 1;
+    if (rate.count > 5) return NextResponse.json({ error: "Please try again later." }, { status: 429 });
+  }
+  const contentLength = Number(req.headers.get("content-length") || 0);
+  if (contentLength > 16_000) return NextResponse.json({ error: "Invalid request body." }, { status: 413 });
+  if (req.headers.get("content-type")?.split(";")[0].trim().toLowerCase() !== "application/json") {
+    return NextResponse.json({ error: "Invalid request body." }, { status: 415 });
+  }
+  let body: unknown;
 
   try {
     body = await req.json();
@@ -27,10 +42,11 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const name = typeof body.name === "string" ? body.name.trim() : "";
-  const email = typeof body.email === "string" ? body.email.trim() : "";
-  const subject = typeof body.subject === "string" ? body.subject.trim() : "";
-  const message = typeof body.message === "string" ? body.message.trim() : "";
+  const input = body && typeof body === "object" ? body as Partial<ContactPayload> : {};
+  const name = typeof input.name === "string" ? input.name.trim() : "";
+  const email = typeof input.email === "string" ? input.email.trim() : "";
+  const subject = typeof input.subject === "string" ? input.subject.trim() : "";
+  const message = typeof input.message === "string" ? input.message.trim() : "";
 
   if (!name || !email || !subject || !message) {
     return NextResponse.json(

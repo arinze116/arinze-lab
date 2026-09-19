@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
 import { getAllWriting, getWritingBySlug } from "@/lib/content";
 import { Badge } from "@/components/ui/badge";
@@ -25,22 +26,23 @@ export async function generateMetadata({
     const { meta } = getWritingBySlug(slug);
     const url = `/writing/${slug}`;
     return {
-      title: meta.title,
-      description: meta.description,
+      title: meta.seo?.title ?? meta.title,
+      description: meta.seo?.description ?? meta.description,
       alternates: { canonical: url },
       openGraph: {
-        title: meta.title,
-        description: meta.description,
+        title: meta.seo?.title ?? meta.title,
+        description: meta.seo?.description ?? meta.description,
         url,
         type: "article",
         publishedTime: meta.date,
         tags: meta.tags,
-        images: meta.featuredImage ? [meta.featuredImage] : undefined,
+        images: meta.seo?.image ?? meta.featuredImage,
       },
       twitter: {
         card: "summary_large_image",
-        title: meta.title,
-        description: meta.description,
+         title: meta.seo?.title ?? meta.title,
+         description: meta.seo?.description ?? meta.description,
+         images: meta.seo?.image ?? meta.featuredImage,
       },
     };
   } catch {
@@ -110,6 +112,7 @@ export default async function WritingDetailPage({
       <p className="mt-3 text-[var(--color-text-secondary)]">
         {meta.description}
       </p>
+      {meta.featuredImage && <Image src={meta.featuredImage} alt={`${meta.title} cover`} width={1200} height={630} className="mt-8 h-auto w-full border border-[var(--color-border)]" />}
 
       <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,720px)_180px]">
         <div className="prose-article">

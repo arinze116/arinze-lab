@@ -1,17 +1,18 @@
 import type { Metadata } from "next";
 import { getAllProjects } from "@/lib/content";
 import { ProjectsExplorer } from "@/components/sections/projects-explorer";
+import { getSiteContent } from "@/lib/site-content";
+
+const siteContent = getSiteContent();
 
 export const metadata: Metadata = {
-  title: "Projects",
-  description:
-    "A showcase of software Arinze has designed, built, and shipped.",
-  alternates: { canonical: "/projects" },
+  title: siteContent.pageSeo.projects.title,
+  description: siteContent.pageSeo.projects.description,
+  alternates: { canonical: siteContent.pageSeo.projects.canonical },
   openGraph: {
-    title: "Projects",
-    description:
-      "A showcase of software Arinze has designed, built, and shipped.",
-    url: "/projects",
+    title: siteContent.pageSeo.projects.title,
+    description: siteContent.pageSeo.projects.description,
+    url: siteContent.pageSeo.projects.canonical,
     type: "website",
   },
 };

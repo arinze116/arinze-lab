@@ -1,14 +1,26 @@
+import Image from "next/image";
 import type { ReactNode } from "react";
 
 function inline(text: string): ReactNode[] {
   return text
-    .split(/(\*\*[^*]+\*\*|`[^`]+`)/g)
+    .split(/(\*\*[^*]+\*\*|`[^`]+`|\[[^\]]+\]\([^\s)]+\))/g)
     .filter(Boolean)
     .map((part, index) => {
       if (part.startsWith("**"))
         return <strong key={index}>{part.slice(2, -2)}</strong>;
       if (part.startsWith("`"))
         return <code key={index}>{part.slice(1, -1)}</code>;
+      const link = part.match(/^\[([^\]]+)\]\(([^\s)]+)\)$/);
+      if (link) {
+        const [, label, href] = link;
+        if (href.startsWith("/") || href.startsWith("https://") || href.startsWith("http://") || href.startsWith("mailto:")) {
+          return (
+            <a key={index} href={href} target={href.startsWith("http") ? "_blank" : undefined} rel={href.startsWith("http") ? "noopener noreferrer" : undefined}>
+              {label}
+            </a>
+          );
+        }
+      }
       return part;
     });
 }
@@ -48,6 +60,7 @@ export function ContentRenderer({ content }: { content: string }) {
 
   lines.forEach((line) => {
     const heading = line.match(/^(#{1,3})\s+(.+)$/);
+    const image = line.match(/^!\[([^\]]*)\]\((\/images\/[a-zA-Z0-9_./-]+)\)$/);
     if (heading) {
       flushParagraph();
       flushList();
@@ -80,6 +93,10 @@ export function ContentRenderer({ content }: { content: string }) {
           {title}
         </h2>,
       );
+    } else if (image) {
+      flushParagraph();
+      flushList();
+      nodes.push(<Image key={`img-${nodes.length}`} src={image[2]} alt={image[1]} width={1200} height={800} className="h-auto w-full" />);
     } else if (/^-\s+/.test(line)) {
       flushParagraph();
       list.push(line.replace(/^-\s+/, ""));

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
 import { getAllResearch, getResearchBySlug } from "@/lib/content";
 import { Badge } from "@/components/ui/badge";
@@ -25,20 +26,21 @@ export async function generateMetadata({
     const { meta } = getResearchBySlug(slug);
     const url = `/research/${slug}`;
     return {
-      title: meta.title,
-      description: meta.summary,
+      title: meta.seo?.title ?? meta.title,
+      description: meta.seo?.description ?? meta.summary,
       alternates: { canonical: url },
       openGraph: {
-        title: meta.title,
-        description: meta.summary,
+        title: meta.seo?.title ?? meta.title,
+        description: meta.seo?.description ?? meta.summary,
         url,
         type: "article",
         publishedTime: meta.date,
       },
       twitter: {
         card: "summary_large_image",
-        title: meta.title,
-        description: meta.summary,
+         title: meta.seo?.title ?? meta.title,
+         description: meta.seo?.description ?? meta.summary,
+         images: meta.seo?.image ?? meta.featuredImage,
       },
     };
   } catch {
@@ -103,6 +105,7 @@ export default async function ResearchDetailPage({
       <p className="mt-3 text-[var(--color-text-secondary)]">
         {meta.summary || meta.description}
       </p>
+      {meta.featuredImage && <Image src={meta.featuredImage} alt={`${meta.title} cover`} width={1200} height={630} className="mt-8 h-auto w-full border border-[var(--color-border)]" />}
 
       <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,720px)_180px]">
         <div className="prose-article">

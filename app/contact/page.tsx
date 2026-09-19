@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import { Github, Linkedin, Twitter, Mail, MapPin } from "lucide-react";
 import { ContactForm } from "@/components/sections/contact-form";
 import { siteConfig } from "@/lib/site";
+import { getSiteContent } from "@/lib/site-content";
+
+const siteContent = getSiteContent();
 
 export const metadata: Metadata = {
-  title: "Contact",
-  description:
-    "Get in touch with Arinze for projects, collaborations, or questions.",
+  title: siteContent.contact.title,
+  description: siteContent.contact.description,
   alternates: { canonical: "/contact" },
   openGraph: {
     title: "Contact",
@@ -22,14 +24,12 @@ export default function ContactPage() {
     <section className="page-shell">
       <div className="grid gap-12 md:grid-cols-[1fr_360px]">
         <div>
-          <p className="eyebrow">Opportunities & collaboration</p>
+          <p className="eyebrow">{siteContent.contact.eyebrow}</p>
           <h1 className="mt-3 text-4xl font-bold tracking-tight md:text-5xl">
-            Let&apos;s connect.
+            {siteContent.contact.title}
           </h1>
           <p className="mt-4 max-w-lg text-[var(--color-text-secondary)]">
-            Open to software engineering, security, AI automation, and Web3
-            opportunities. Send a short note about what you&apos;re working on
-            or where you think I could help.
+            {siteContent.contact.description}
           </p>
           <div className="mt-10 max-w-lg">
             <ContactForm />
@@ -39,7 +39,7 @@ export default function ContactPage() {
         <aside className="flex flex-col gap-6 rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6 md:h-fit">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
-              Business Email
+              {siteContent.contact.emailLabel}
             </p>
             <a
               href={`mailto:${siteConfig.email}`}
@@ -50,7 +50,7 @@ export default function ContactPage() {
           </div>
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
-              Location
+              {siteContent.contact.locationLabel}
             </p>
             <p className="mt-1 inline-flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
               <MapPin size={14} /> {siteConfig.location}
@@ -58,7 +58,7 @@ export default function ContactPage() {
           </div>
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
-              Elsewhere
+              {siteContent.contact.elsewhereLabel}
             </p>
             <div className="mt-2 flex items-center gap-4">
               <a

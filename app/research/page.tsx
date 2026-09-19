@@ -1,17 +1,18 @@
 import type { Metadata } from "next";
 import { getAllResearch } from "@/lib/content";
 import { ResearchCard } from "@/components/ui/research-card";
+import { getSiteContent } from "@/lib/site-content";
+
+const siteContent = getSiteContent();
 
 export const metadata: Metadata = {
-  title: "Research",
-  description:
-    "Deeper technical explorations, experiments, and long-form analysis.",
-  alternates: { canonical: "/research" },
+  title: siteContent.pageSeo.research.title,
+  description: siteContent.pageSeo.research.description,
+  alternates: { canonical: siteContent.pageSeo.research.canonical },
   openGraph: {
-    title: "Research",
-    description:
-      "Deeper technical explorations, experiments, and long-form analysis.",
-    url: "/research",
+    title: siteContent.pageSeo.research.title,
+    description: siteContent.pageSeo.research.description,
+    url: siteContent.pageSeo.research.canonical,
     type: "website",
   },
 };

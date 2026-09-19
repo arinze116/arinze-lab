@@ -24,21 +24,21 @@ export async function generateMetadata({
     const { meta } = getProjectBySlug(slug);
     const url = `/projects/${slug}`;
     return {
-      title: meta.title,
-      description: meta.summary,
+      title: meta.seo?.title ?? meta.title,
+      description: meta.seo?.description ?? meta.summary,
       alternates: { canonical: url },
       openGraph: {
-        title: meta.title,
-        description: meta.summary,
+        title: meta.seo?.title ?? meta.title,
+        description: meta.seo?.description ?? meta.summary,
         url,
         type: "website",
-        images: meta.cover ? [meta.cover] : undefined,
+        images: meta.seo?.image || meta.cover ? [meta.seo?.image || meta.cover] : undefined,
       },
       twitter: {
         card: "summary_large_image",
-        title: meta.title,
-        description: meta.summary,
-        images: meta.cover ? [meta.cover] : undefined,
+        title: meta.seo?.title ?? meta.title,
+        description: meta.seo?.description ?? meta.summary,
+        images: meta.seo?.image || meta.cover ? [meta.seo?.image || meta.cover] : undefined,
       },
     };
   } catch {
@@ -115,6 +115,14 @@ export default async function ProjectDetailPage({
           className="object-cover"
         />
       </div>
+
+      {meta.images && meta.images.length > 0 && (
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          {meta.images.map((image) => (
+            <Image key={image} src={image} alt={`${meta.title} screenshot`} width={1200} height={800} className="h-auto w-full border border-[var(--color-border)]" />
+          ))}
+        </div>
+      )}
 
       <div className="mt-10 flex flex-wrap gap-4">
         {meta.telegram && (

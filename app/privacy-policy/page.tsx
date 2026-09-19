@@ -29,10 +29,14 @@ export default function PrivacyPolicyPage() {
           is not sold or shared with third parties.
         </p>
         <h2>Analytics</h2>
-        <p>
-          Aggregate, anonymized analytics may be collected to understand which
-          pages and projects are most useful to visitors.
-        </p>
+         <p>
+           Aggregate, anonymized analytics may be collected to understand which
+           pages and projects are most useful to visitors.
+         </p>
+         <h2>Administration</h2>
+         <p>
+           Site content is managed by an authorized administrator through a private Telegram bot. Operational records may include Telegram account identifiers, commands, draft content, and GitHub commit identifiers. These records are used for authorization, audit history, backup, and recovery and are not exposed through the public site.
+         </p>
         <h2>Contact</h2>
         <p>Questions about this policy can be sent to arinzelabs@gmail.com.</p>
       </div>

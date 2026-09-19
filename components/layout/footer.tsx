@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Github, Linkedin, Mail } from "lucide-react";
+import { Github, Linkedin, Mail, Twitter } from "lucide-react";
 import { navItems, siteConfig } from "@/lib/site";
 export function Footer() {
   return (
@@ -9,8 +9,7 @@ export function Footer() {
           <div>
             <p className="font-mono text-sm">{siteConfig.name}</p>
             <p className="mt-3 max-w-sm text-sm leading-6 text-[var(--color-text-secondary)]">
-              Independent software engineering, security research, and practical
-              automation.
+              {siteConfig.description}
             </p>
           </div>
           <div className="grid grid-cols-2 gap-3 text-sm text-[var(--color-text-secondary)]">
@@ -54,11 +53,22 @@ export function Footer() {
             >
               <Mail size={18} />
             </a>
+            {siteConfig.socials.x && (
+              <a
+                href={siteConfig.socials.x}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="X"
+                className="hover:text-white"
+              >
+                <Twitter size={18} />
+              </a>
+            )}
           </div>
         </div>
         <div className="mt-10 flex flex-wrap justify-between gap-2 border-t border-[var(--color-border)] pt-5 font-mono text-xs text-[var(--color-text-faint)]">
           <span>© {new Date().getFullYear()} ArinzeLab.</span>
-          <span>Open to considered opportunities.</span>
+          <span>{siteConfig.availabilityText}</span>
         </div>
       </div>
     </footer>

@@ -7,21 +7,25 @@ import { Footer } from "@/components/layout/footer";
 import { JsonLd } from "@/components/json-ld";
 import { personSchema, websiteSchema } from "@/lib/schema";
 import { siteConfig } from "@/lib/site";
+import { getSiteContent } from "@/lib/site-content";
+
+const siteContent = getSiteContent();
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
-  title: {
-    default: `${siteConfig.name} — Software Developer & Researcher`,
-    template: `%s — ${siteConfig.name}`,
-  },
-  description: siteConfig.description,
+    title: {
+      default: siteContent.seo.title,
+      template: siteContent.seo.titleTemplate,
+    },
+    description: siteContent.seo.description,
   alternates: {
     canonical: "/",
   },
-  openGraph: {
+    keywords: siteContent.seo.keywords,
+    openGraph: {
     // og:image is injected automatically by app/opengraph-image.tsx.
-    title: `${siteConfig.name} — Software Developer & Researcher`,
-    description: siteConfig.description,
+      title: siteContent.seo.title,
+      description: siteContent.seo.description,
     type: "website",
     url: siteConfig.url,
     siteName: siteConfig.name,
@@ -30,8 +34,8 @@ export const metadata: Metadata = {
   twitter: {
     // twitter:image is injected automatically by app/twitter-image.tsx.
     card: "summary_large_image",
-    title: `${siteConfig.name} — Software Developer & Researcher`,
-    description: siteConfig.description,
+      title: siteContent.seo.title,
+      description: siteContent.seo.description,
   },
 };
 

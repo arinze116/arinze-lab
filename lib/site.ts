@@ -1,26 +1,25 @@
-// Canonical production origin. Single source of truth for metadataBase,
-// the sitemap, robots, canonical tags, JSON-LD, and llms.txt. No trailing slash.
-export const SITE_URL = "https://arinzelab.vercel.app";
+import siteJson from "@/content/site.json";
+import type { SiteContent } from "@/types/site";
+
+// This compatibility export keeps client layout components free from Node.js
+// filesystem imports while site.json remains the editable source of truth.
+export const siteContent = siteJson as SiteContent;
+export const SITE_URL = siteContent.url;
 
 export const siteConfig = {
-  name: "ArinzeLab.",
-  // Human/legal name of the person behind the site, used in Person JSON-LD.
-  authorName: "Arinze Chinweuba",
-  url: SITE_URL,
-  description:
-    "Software engineering, security research, automation, and technical writing by Arinze Chinweuba.",
-  email: "arinzelabs@gmail.com",
-  location: "Nigeria",
-  socials: {
-    github: "https://github.com/arinze116",
-    linkedin: "https://linkedin.com/in/arinze-chinweuba",
-    x: "https://x.com/arinze116",
-  },
+  name: siteContent.name,
+  authorName: siteContent.authorName,
+  url: siteContent.url,
+  description: siteContent.description,
+  email: siteContent.email,
+  location: siteContent.location,
+  resumeUrl: siteContent.resumeUrl,
+  availabilityText: siteContent.availabilityText,
+  socials: Object.fromEntries(
+    siteContent.socials.map((social) => [social.platform, social.href]),
+  ) as Record<string, string>,
 };
 
-export const navItems = [
-  { label: "Work", href: "/projects" },
-  { label: "Writing", href: "/writing" },
-  { label: "Research", href: "/research" },
-  { label: "About", href: "/about" },
-];
+export const navItems = siteContent.navigation
+  .filter((item) => item.visible)
+  .sort((a, b) => a.order - b.order);

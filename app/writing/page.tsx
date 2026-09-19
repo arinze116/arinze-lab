@@ -1,17 +1,18 @@
 import type { Metadata } from "next";
 import { getAllWriting } from "@/lib/content";
 import { WritingExplorer } from "@/components/sections/writing-explorer";
+import { getSiteContent } from "@/lib/site-content";
+
+const siteContent = getSiteContent();
 
 export const metadata: Metadata = {
-  title: "Writing",
-  description:
-    "Articles, tutorials, engineering notes, and lessons from building software.",
-  alternates: { canonical: "/writing" },
+  title: siteContent.pageSeo.writing.title,
+  description: siteContent.pageSeo.writing.description,
+  alternates: { canonical: siteContent.pageSeo.writing.canonical },
   openGraph: {
-    title: "Writing",
-    description:
-      "Articles, tutorials, engineering notes, and lessons from building software.",
-    url: "/writing",
+    title: siteContent.pageSeo.writing.title,
+    description: siteContent.pageSeo.writing.description,
+    url: siteContent.pageSeo.writing.canonical,
     type: "website",
   },
 };

@@ -17,6 +17,14 @@ export interface ProjectMeta {
   telegram?: string;
   demo?: string;
   featured?: boolean;
+  published?: boolean;
+  order?: number;
+  images?: string[];
+  seo?: {
+    title?: string;
+    description?: string;
+    image?: string;
+  };
 }
 
 export interface WritingMeta {
@@ -30,6 +38,15 @@ export interface WritingMeta {
   featuredImage?: string;
   summary?: string;
   topic?: string;
+  published?: boolean;
+  featured?: boolean;
+  order?: number;
+  images?: string[];
+  seo?: {
+    title?: string;
+    description?: string;
+    image?: string;
+  };
 }
 
 export interface ResearchMeta {
@@ -42,4 +59,14 @@ export interface ResearchMeta {
   description?: string;
   category?: string;
   tags?: string[];
+  featuredImage?: string;
+  published?: boolean;
+  featured?: boolean;
+  order?: number;
+  images?: string[];
+  seo?: {
+    title?: string;
+    description?: string;
+    image?: string;
+  };
 }

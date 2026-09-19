@@ -1,13 +1,15 @@
 import { MetadataRoute } from "next";
 import { getAllProjects, getAllWriting, getAllResearch } from "@/lib/content";
 import { SITE_URL } from "@/lib/site";
+import { getSiteContent } from "@/lib/site-content";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
+  const siteContent = getSiteContent();
 
   // /search is intentionally excluded — it is noindex (thin utility page).
   const staticRoutes: MetadataRoute.Sitemap = [
-    { path: "", priority: 1.0, changeFrequency: "weekly" as const },
+    { path: "", priority: 1.0, changeFrequency: "weekly" as const, lastModified: new Date(siteContent.now.updatedAt) },
     { path: "/about", priority: 0.8, changeFrequency: "monthly" as const },
     { path: "/projects", priority: 0.9, changeFrequency: "weekly" as const },
     { path: "/writing", priority: 0.9, changeFrequency: "weekly" as const },
