@@ -180,10 +180,18 @@ button:disabled {
   color: var(--color-text-primary);
   font-weight: 700;
 }
+.prose-article ul {
+  list-style-type: disc;
+}
+
+.prose-article ol {
+  list-style-type: decimal;
+}
+
 .prose-article ul,
 .prose-article ol {
   margin: 1.25rem 0;
-  padding-left: 1.2rem;
+  padding-left: 1.5rem;
 }
 .prose-article li {
   margin: 0.5rem 0;
