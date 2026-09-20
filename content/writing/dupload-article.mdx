@@ -1,0 +1,160 @@
+---
+title: 'How I Built Dupload: From a Telegram Command to a Media Pipeline'
+description: >-
+  The process behind building Dupload, from the first download flow to queues,
+  FFmpeg processing, Telegram delivery, and the bugs that forced me to
+  understand the whole pipeline.
+date: '2026-09-20'
+category: Bots
+tags:
+  - Node.js
+  - Telegraf
+  - yt-dlp
+  - FFmpeg
+  - Telegram
+featuredImage: /images/writing/dupload-article.jpg
+published: true
+featured: true
+---
+I didn't start Dupload by trying to build a complete media-processing system.
+
+The first goal was much simpler:
+
+Send a video URL to a Telegram bot and get the video back.
+
+That sounds straightforward until the system has to deal with downloading media, processing it, uploading it to Telegram, handling large files, reporting progress, cancelling jobs, cleaning temporary files, and surviving all the strange formats that different platforms return.
+
+Dupload grew out of solving those problems one at a time.
+
+1. Starting with the smallest useful version
+
+The first version was basically a pipeline:
+
+Telegram message
+      ↓
+Extract URL
+      ↓
+yt-dlp
+      ↓
+Download video
+      ↓
+Send video to Telegram
+
+I used Node.js with Telegraf for the Telegram side and yt-dlp for downloading media.
+
+yt-dlp handled the difficult part of supporting different websites and media formats, so I didn't need to implement individual downloaders for every platform.
+
+At this stage, the goal wasn't architecture.
+
+It was simply getting the complete path working.
+
+A user sends a link.
+
+The bot downloads it.
+
+The bot sends the result back.
+
+Once that worked, the problems became much more interesting.
+
+2. The first serious problem: Telegram uploads
+
+Downloading the media wasn't the hardest part.
+
+Uploading it reliably to Telegram was.
+
+I was developing and running the bot in Termux, which introduced another variable into the system. Some Telegram uploads were failing because of the way the HTTP connection was being negotiated.
+
+The problem eventually came down to HTTP/2 behavior.
+
+Retries weren't enough because the underlying connection behavior was still wrong.
+
+I ended up creating a custom HTTPS agent and forcing the relevant requests to use HTTP/1.1 instead of relying on the problematic HTTP/2 path.
+
+That fixed the upload problem.
+
+This was one of the first lessons from Dupload:
+
+«A working downloader doesn't mean you have a working delivery pipeline.»
+
+The boundaries between components matter just as much as the components themselves.
+
+3. Turning a script into an actual bot
+
+Once downloading and uploading worked, using the bot exposed another problem.
+
+What happens when several people send links at the same time?
+
+If every request immediately starts downloading, the machine can quickly become overloaded.
+
+So I introduced a queue.
+
+The basic flow became:
+
+Telegram
+   ↓
+Receive request
+   ↓
+Validate URL
+   ↓
+Add job to queue
+   ↓
+Process job
+   ↓
+Download
+   ↓
+Process media
+   ↓
+Upload
+   ↓
+Cleanup
+
+This changed the project from a simple script into a small job-processing system.
+
+I also added progress reporting so users weren't left staring at a message wondering whether anything was happening.
+
+Cancellation became important too.
+
+That led to the "/stop" command, which allowed a user to cancel their active or queued operation instead of waiting for the entire job to finish.
+
+4. Media formats were more complicated than expected
+
+One of the problems I ran into involved format selection.
+
+A format could look valid according to the information returned by the downloader while still causing problems later in the pipeline.
+
+One example involved VP9/Facebook media.
+
+The format-selection logic needed to be more careful about what was actually being downloaded and whether the resulting file could be processed and delivered correctly.
+
+This pushed me toward treating media processing as its own stage rather than assuming that whatever yt-dlp returned could immediately be sent to Telegram.
+
+5. Adding FFmpeg
+
+Large files created another problem.
+
+Even when a download succeeded, the resulting file might be too large or otherwise unsuitable for direct Telegram delivery.
+
+That's where FFmpeg became part of the pipeline.
+
+Instead of thinking:
+
+download → upload
+
+the system became:
+
+download
+   ↓
+inspect
+   ↓
+process/compress when necessary
+   ↓
+validate
+   ↓
+upload
+
+FFmpeg gave me control over things like:
+
+- Video scaling
+- Compression
+- Audio/video processing
+- Format conversion
