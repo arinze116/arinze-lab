@@ -19,71 +19,98 @@ telegram: 'https://t.me/duploadebot'
 featured: true
 published: true
 ---
-Overview
+## Overview
+
 Dupload is a Telegram-based video downloader and media-processing system built to turn a supported media URL into a ready-to-watch video without requiring users to leave Telegram.
+
 The project combines Node.js, Telegraf, yt-dlp, and FFmpeg into a single processing pipeline that handles downloading, media validation, audio recovery, compression, Telegram delivery, cancellation, retries, and temporary-file cleanup.
+
 What started as a simple downloader became an exercise in making an unreliable media-processing workflow behave predictably across different platforms, codecs, network conditions, and deployment environments.
-The Problem
+
+## The Problem
+
 Downloading a video is deceptively simple.
+
 A URL can resolve to different video and audio formats, separate media streams, platform-specific CDN responses, incompatible codecs, incomplete metadata, or files that appear valid while actually missing an audio track.
+
 The problem becomes larger when the downloaded file has to be delivered through Telegram.
+
 A reliable system needs to answer several questions before sending anything to the user:
-Did the download actually complete?
-Does the resulting file contain a real audio stream?
-Is the file within the configured upload limit?
-If it is too large, can it be compressed without becoming unusable?
-What happens if Telegram rejects the upload?
-Can the user cancel a long-running download?
-What happens when several links are sent at once?
-Are temporary media files cleaned up after the job finishes?
+
+- Did the download actually complete?
+- Does the resulting file contain a real audio stream?
+- Is the file within the configured upload limit?
+- If it is too large, can it be compressed without becoming unusable?
+- What happens if Telegram rejects the upload?
+- Can the user cancel a long-running download?
+- What happens when several links are sent at once?
+- Are temporary media files cleaned up after the job finishes?
+
 Dupload was designed around those failure cases rather than treating them as edge cases.
-The Solution
+
+## The Solution
+
 Dupload implements a complete URL-to-Telegram media pipeline:
-A user sends a supported media URL.
-The URL is placed into a per-chat FIFO queue.
-Dupload downloads the highest-quality compatible media available.
-The resulting file is inspected with ffprobe.
-Missing audio is detected and repaired when necessary.
-The file size is checked against the configured limit.
-Oversized media is transcoded to 720p with H.264/AAC.
-The compressed output is checked again before upload.
-The finished video is uploaded directly through the Telegram Bot API.
-Transient upload failures are retried with exponential backoff.
-Temporary media files are removed after processing.
+
+1. A user sends a supported media URL.
+2. The URL is placed into a per-chat FIFO queue.
+3. Dupload downloads the highest-quality compatible media available.
+4. The resulting file is inspected with ffprobe.
+5. Missing audio is detected and repaired when necessary.
+6. The file size is checked against the configured limit.
+7. Oversized media is transcoded to 720p with H.264/AAC.
+8. The compressed output is checked again before upload.
+9. The finished video is uploaded directly through the Telegram Bot API.
+10. Transient upload failures are retried with exponential backoff.
+11. Temporary media files are removed after processing.
+
 This makes the bot more than a downloader. It is a small media-processing pipeline with explicit validation at each stage.
-Architecture
+
+## Architecture
+
 The application is divided into two main layers.
-Telegram control layer
+
+### Telegram Control Layer
+
 index.js handles:
-Telegram commands and messages
-URL extraction
-Job creation
-Per-chat queues
-Cancellation
-Progress updates
-Upload handling
-Retry logic
-Cleanup coordination
+
+- Telegram commands and messages
+- URL extraction
+- Job creation
+- Per-chat queues
+- Cancellation
+- Progress updates
+- Upload handling
+- Retry logic
+- Cleanup coordination
+
 Each chat has an active job and a FIFO queue. This prevents multiple downloads from competing for the same resources while still allowing users to send additional links without losing them.
-Media-processing layer
+
+### Media-Processing Layer
+
 downloader.js handles:
-yt-dlp execution
-Platform-specific download behavior
-Audio-stream inspection
-Missing-audio recovery
-FFmpeg transcoding
-File-size validation
-Temporary-file cleanup
+
+- yt-dlp execution
+- Platform-specific download behavior
+- Audio-stream inspection
+- Missing-audio recovery
+- FFmpeg transcoding
+- File-size validation
+- Temporary-file cleanup
+
 The two layers communicate through a job object containing the job ID, cancellation state, and reference to the currently running child process.
+
 That shared state is what allows /stop to terminate a running download rather than merely telling the user that the job has been cancelled.
-Download Pipeline
+
+## Download Pipeline
+
 Dupload uses yt-dlp as the primary extraction engine.
+
 The format selection prioritizes H.264 video with M4A audio before falling back to broader video/audio combinations. The resulting streams are merged into MP4 where necessary.
+
 The preferred format chain is designed to produce media that is broadly compatible with Telegram and common video players:
-H.264 video with M4A audio
-H.264-compatible video with audio
-Best available video and audio combination
-Best single available format
-Playlist downloads are disabled so that a single user-supplied URL does not unexpectedly expand into a large batch of media.
-The downloader also keeps track of the underlying child process so that long-running extraction jobs can be cancelled cleanly.
-Media Validation
+
+1. H.264 video with M4A audio
+2. H.264-compatible video with audio
+3. Best available video and audio combination
+4. Best single available format
