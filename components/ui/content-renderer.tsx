@@ -8,19 +8,38 @@ function inline(text: string): ReactNode[] {
     .map((part, index) => {
       if (part.startsWith("**"))
         return <strong key={index}>{part.slice(2, -2)}</strong>;
+
       if (part.startsWith("`"))
         return <code key={index}>{part.slice(1, -1)}</code>;
-      const link = part.match(/^\[([^\]]+)\]\(([^\s)]+)\)$/);
+
+      const link = part.match(/^\[([^\]]+)\]\(([^ \s)]+)\)$/);
+
       if (link) {
         const [, label, href] = link;
-        if (href.startsWith("/") || href.startsWith("https://") || href.startsWith("http://") || href.startsWith("mailto:")) {
+
+        if (
+          href.startsWith("/") ||
+          href.startsWith("https://") ||
+          href.startsWith("http://") ||
+          href.startsWith("mailto:")
+        ) {
           return (
-            <a key={index} href={href} target={href.startsWith("http") ? "_blank" : undefined} rel={href.startsWith("http") ? "noopener noreferrer" : undefined}>
+            <a
+              key={index}
+              href={href}
+              target={href.startsWith("http") ? "_blank" : undefined}
+              rel={
+                href.startsWith("http")
+                  ? "noopener noreferrer"
+                  : undefined
+              }
+            >
               {label}
             </a>
           );
         }
       }
+
       return part;
     });
 }
@@ -36,58 +55,92 @@ function slugify(value: string) {
 export function ContentRenderer({ content }: { content: string }) {
   const lines = content.trim().split("\n");
   const nodes: ReactNode[] = [];
+
   let paragraph: string[] = [];
-  let list: string[] = [];
+  let unorderedList: string[] = [];
+  let orderedList: string[] = [];
 
   const flushParagraph = () => {
-    if (paragraph.length)
+    if (paragraph.length) {
       nodes.push(
-        <p key={`p-${nodes.length}`}>{inline(paragraph.join(" "))}</p>,
+        <p key={`p-${nodes.length}`}>
+          {inline(paragraph.join(" "))}
+        </p>,
       );
+    }
+
     paragraph = [];
   };
-  const flushList = () => {
-    if (list.length)
+
+  const flushUnorderedList = () => {
+    if (unorderedList.length) {
       nodes.push(
-        <ul key={`l-${nodes.length}`}>
-          {list.map((item) => (
-            <li key={item}>{inline(item)}</li>
+        <ul key={`ul-${nodes.length}`}>
+          {unorderedList.map((item, index) => (
+            <li key={`ul-item-${index}`}>{inline(item)}</li>
           ))}
         </ul>,
       );
-    list = [];
+    }
+
+    unorderedList = [];
+  };
+
+  const flushOrderedList = () => {
+    if (orderedList.length) {
+      nodes.push(
+        <ol key={`ol-${nodes.length}`}>
+          {orderedList.map((item, index) => (
+            <li key={`ol-item-${index}`}>{inline(item)}</li>
+          ))}
+        </ol>,
+      );
+    }
+
+    orderedList = [];
+  };
+
+  const flushLists = () => {
+    flushUnorderedList();
+    flushOrderedList();
   };
 
   lines.forEach((line) => {
     const heading = line.match(/^(#{1,3})\s+(.+)$/);
-    const image = line.match(/^!\[([^\]]*)\]\((\/images\/[a-zA-Z0-9_./-]+)\)$/);
+
+    const image = line.match(
+      /^!\[([^\]]*)\]\((\/images\/[a-zA-Z0-9_./-]+)\)$/,
+    );
+
+    const unorderedItem = line.match(/^[-*]\s+(.+)$/);
+    const orderedItem = line.match(/^\d+[.)]\s+(.+)$/);
+
     if (heading) {
       flushParagraph();
-      flushList();
+      flushLists();
+
       const title = heading[2];
       const level = heading[1].length;
-      if (level === 1)
+
+      if (level === 1 || level === 2) {
         nodes.push(
           <h2 key={`h-${nodes.length}`} id={slugify(title)}>
             {title}
           </h2>,
         );
-      else if (level === 2)
-        nodes.push(
-          <h2 key={`h-${nodes.length}`} id={slugify(title)}>
-            {title}
-          </h2>,
-        );
-      else
+      } else {
         nodes.push(
           <h3 key={`h-${nodes.length}`} id={slugify(title)}>
             {title}
           </h3>,
         );
+      }
     } else if (/^\*\*[^*]+\*\*$/.test(line.trim())) {
       flushParagraph();
-      flushList();
+      flushLists();
+
       const title = line.trim().slice(2, -2);
+
       nodes.push(
         <h2 key={`h-${nodes.length}`} id={slugify(title)}>
           {title}
@@ -95,27 +148,53 @@ export function ContentRenderer({ content }: { content: string }) {
       );
     } else if (image) {
       flushParagraph();
-      flushList();
-      nodes.push(<Image key={`img-${nodes.length}`} src={image[2]} alt={image[1]} width={1200} height={800} className="h-auto w-full" />);
-    } else if (/^-\s+/.test(line)) {
+      flushLists();
+
+      nodes.push(
+        <Image
+          key={`img-${nodes.length}`}
+          src={image[2]}
+          alt={image[1]}
+          width={1200}
+          height={800}
+          className="h-auto w-full"
+        />,
+      );
+    } else if (unorderedItem) {
       flushParagraph();
-      list.push(line.replace(/^-\s+/, ""));
+      flushOrderedList();
+
+      unorderedList.push(unorderedItem[1]);
+    } else if (orderedItem) {
+      flushParagraph();
+      flushUnorderedList();
+
+      orderedList.push(orderedItem[1]);
     } else if (!line.trim()) {
       flushParagraph();
-      flushList();
+      flushLists();
     } else {
+      flushParagraph();
+      flushLists();
+
       paragraph.push(line.trim());
     }
   });
+
   flushParagraph();
-  flushList();
+  flushLists();
+
   return <>{nodes}</>;
 }
 
 export function contentHeadings(content: string) {
   return content.split("\n").flatMap((line) => {
     const match =
-      line.match(/^##\s+(.+)$/) ?? line.trim().match(/^\*\*([^*]+)\*\*$/);
-    return match ? [{ title: match[1], id: slugify(match[1]) }] : [];
+      line.match(/^##\s+(.+)$/) ??
+      line.trim().match(/^\*\*([^*]+)\*\*$/);
+
+    return match
+      ? [{ title: match[1], id: slugify(match[1]) }]
+      : [];
   });
 }
