@@ -1,0 +1,156 @@
+---
+title: 'How I Built Mint Pilot: A Rust OpenSea Mint Automation CLI'
+description: >-
+  The engineering process behind building Mint Pilot, from OpenSea discovery and
+  calldata validation to transaction scheduling, wallet orchestration, and
+  experimental EIP-7702 execution.
+date: '2026-09-20'
+category: Web3
+tags:
+  - Rust
+  - OpenSea
+  - Ethereum
+  - EIP-7702
+  - Alloy
+  - Telegram
+featuredImage: /images/writing/mint-pilot.jpg
+published: true
+featured: true
+---
+Mint Pilot started from a simple problem:
+
+I wanted a controlled way to automate OpenSea minting without turning the process into a collection of fragile scripts.
+
+The interesting part wasn't sending a transaction.
+
+The difficult part was everything around the transaction: discovering the correct collection and mint stage, checking wallet eligibility, validating the transaction data, handling fees and nonces, dealing with scheduled phases, managing multiple wallets, and knowing what to do when a transaction becomes uncertain.
+
+That became the foundation for Mint Pilot.
+
+1. Starting with the CLI
+
+I decided to build Mint Pilot as a Rust CLI instead of starting with a web interface.
+
+The first boundary was intentionally simple:
+
+opensea-mint doctor
+opensea-mint calldata
+opensea-mint mint
+opensea-mint wallets create
+opensea-mint deploy-executor
+
+Each command represented a different responsibility.
+
+"doctor" could validate the configuration and external dependencies.
+
+"calldata" could inspect mint information without actually broadcasting a transaction.
+
+"wallets create" could generate a structured wallet manifest.
+
+"mint" handled the actual mint workflow.
+
+"deploy-executor" belonged to the experimental sponsored execution path.
+
+This separation became important because I didn't want every operation to immediately have permission to spend funds or broadcast transactions.
+
+2. Connecting Mint Pilot to OpenSea
+
+The next problem was figuring out how to turn an OpenSea collection into something the application could actually work with.
+
+A collection could be provided through an OpenSea slug, collection URL, or contract address.
+
+From there, Mint Pilot needed to discover information such as:
+
+- Collection identity
+- Available mint stages
+- Stage timing
+- Mint quantity limits
+- Pricing
+- Wallet eligibility
+- Mint transaction data
+
+OpenSea's current Drops API can expose active drop information and can build ready-to-sign mint transaction data for a specified minter and quantity.
+
+But I didn't want to blindly trust whatever transaction data came back.
+
+That led to one of the most important parts of the project.
+
+3. Validating calldata before signing
+
+Getting calldata from an API is not the same thing as knowing that the calldata is safe to sign.
+
+Mint Pilot therefore treats the returned transaction as data that needs to be inspected.
+
+The validation layer checks that the action corresponds to the expected:
+
+- Collection contract
+- Wallet/minter
+- Mint stage
+- Quantity
+- Token information where applicable
+
+It also rejects unexpected action types and invalid action responses.
+
+This was one of the areas where writing tests became especially important.
+
+I created tests around cases such as:
+
+valid mint calldata
+        ↓
+correct collection?
+        ↓
+correct wallet?
+        ↓
+correct stage?
+        ↓
+correct quantity?
+        ↓
+expected action?
+        ↓
+safe to continue
+
+If something doesn't match, the transaction shouldn't reach the signing stage.
+
+That distinction is important because OpenSea itself describes its mint transaction endpoint as returning transaction data that the caller is responsible for signing and submitting.
+
+4. Understanding mint stages
+
+Minting isn't always one simple transaction available at any time.
+
+Drops can have different stages with different eligibility rules, prices, limits, and schedules. OpenSea documents stages as time-bound phases with their own wallet eligibility and mint limits.
+
+That meant Mint Pilot needed to understand the difference between:
+
+collection exists
+
+and
+
+collection is currently mintable
+
+The scheduling system therefore became part of the core architecture.
+
+Instead of simply running:
+
+mint()
+
+the application could reason about:
+
+discover
+   ↓
+identify stages
+   ↓
+check eligibility
+   ↓
+wait for selected phase
+   ↓
+refresh state
+   ↓
+validate calldata
+   ↓
+sign
+   ↓
+broadcast
+
+The closer the application gets to the actual mint time, the more important fresh state becomes.
+
+5. Building the wallet system
