@@ -1,0 +1,83 @@
+---
+title: Transly
+summary: >-
+  An asynchronous Telegram transcription bot that converts audio, video, and
+  public media URLs into timestamped English transcripts using Groq, Whisper,
+  FFmpeg, and a persistent job queue.
+cover: /images/projects/transly.jpg
+stack:
+  - Python
+  - python-telegram-bot
+  - Groq Whisper
+  - FFmpeg
+  - yt-dlp
+  - SQLite
+status: Live
+year: 2026
+categories:
+  - Python
+  - Telegram Bot
+  - AI
+  - Media Processing
+github: 'https://github.com/arinze116/Transly'
+telegram: 'https://t.me/Translyebot'
+featured: false
+published: true
+---
+Overview
+Transly is an asynchronous Telegram bot that turns audio, video, and supported public media URLs into timestamped English transcripts.
+The bot accepts media directly through Telegram or retrieves public media from supported URLs. It extracts and normalizes the audio with FFmpeg, transcribes speech using Groq Whisper Large v3, translates non-English transcripts into English, and returns the result directly inside Telegram.
+The system is designed around asynchronous processing, persistent job tracking, media validation, URL security, provider fallback, and automatic cleanup.
+The Problem
+Transcribing media manually creates several unnecessary steps.
+Users may need to download a video, extract its audio, convert it into a supported format, upload it to a transcription service, wait for processing, and then translate the resulting transcript.
+There are also engineering problems behind the scenes:
+Different media platforms expose different formats.
+Videos may contain separate or incompatible audio streams.
+Transcription APIs impose file-size and request limits.
+Long-running media jobs should not block the Telegram interface.
+Public URLs can introduce SSRF and private-network access risks.
+Large transcripts can exceed Telegram's message limits.
+Temporary media files must not accumulate on disk.
+External APIs can fail or become temporarily unavailable.
+Transly was built to handle this pipeline automatically.
+Solution
+Transly provides a Telegram-native interface for the entire workflow.
+A user can:
+Upload an audio or video file.
+Paste a supported public media URL.
+Use /transcribe <URL> to explicitly process a URL.
+Wait while the job moves through the processing pipeline.
+Receive a timestamped transcript directly in Telegram.
+Receive an English translation when the source language is not English.
+Long transcripts are split into Telegram-safe messages and can also be returned as a .txt document.
+Architecture
+The application is built around an asynchronous Telegram worker.
+The main pipeline is:
+Telegram User
+      │
+      ▼
+Telegram Bot
+      │
+      ▼
+Persistent Job Store
+      │
+      ▼
+Processing Queue
+      │
+      ├── URL validation
+      │
+      ├── Media download
+      │
+      ├── FFmpeg audio extraction
+      │
+      ├── Speech transcription
+      │
+      ├── Language detection
+      │
+      ├── English translation
+      │
+      └── Telegram delivery
+      │
+      ▼
+Temporary Media Cleanup
