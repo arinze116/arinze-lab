@@ -9,10 +9,31 @@ export function parseCmsFile(collection: CmsCollection, slug: string, raw: strin
   return { meta: { ...meta, readingTime: `${Math.ceil(readingTime(parsed.content).minutes)} min read` } as CmsEntity, content: `${parsed.content.trim()}\n` };
 }
 
-export function serializeCmsFile(meta: Record<string, unknown>, content: string): string {
-  const frontmatter = { ...meta };
+function removeUndefined(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value.map(removeUndefined);
+  }
+
+  if (!value || typeof value !== "object") {
+    return value;
+  }
+
+  return Object.fromEntries(
+    Object.entries(value)
+      .filter(([, entry]) => entry !== undefined)
+      .map(([key, entry]) => [key, removeUndefined(entry)])
+  );
+}
+
+export function serializeCmsFile(
+  meta: Record<string, unknown>,
+  content: string
+): string {
+  const frontmatter = removeUndefined({ ...meta }) as Record<string, unknown>;
+
   delete frontmatter.slug;
   delete frontmatter.readingTime;
+
   return matter.stringify(`${content.trim()}\n`, frontmatter);
 }
 
