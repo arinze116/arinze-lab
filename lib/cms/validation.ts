@@ -212,9 +212,48 @@ export function safeContentPath(collection: "projects" | "writing" | "research",
 }
 
 export function safeMediaPath(filename: string): string {
-  if (/[\\/]/.test(filename) || filename.includes("..")) throw new Error("Media filename is invalid.");
-  const base = filename.toLowerCase().replace(/[^a-z0-9._-]/g, "-").replace(/-+/g, "-").replace(/^[-.]+|[-.]+$/g, "");
-  if (!base || base.includes("..")) throw new Error("Media filename is invalid.");
-  if (!/\.(png|jpe?g|webp|svg)$/.test(base)) throw new Error("Media must use png, jpg, jpeg, webp, or svg.");
+  if (/[\\\/]/.test(filename) || filename.includes("..")) {
+    throw new Error("Media filename is invalid.");
+  }
+
+  const base = filename
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^[-.]+|[-.]+$/g, "");
+
+  if (!base || base.includes("..")) {
+    throw new Error("Media filename is invalid.");
+  }
+
+  if (!/\.(png|jpe?g|webp|svg)$/.test(base)) {
+    throw new Error("Media must use png, jpg, jpeg, webp, or svg.");
+  }
+
   return `public/images/cms/${base}`;
+}
+
+export function safeCollectionMediaPath(
+  collection: "projects" | "writing" | "research",
+  filename: string,
+): string {
+  if (/[\\\/]/.test(filename) || filename.includes("..")) {
+    throw new Error("Media filename is invalid.");
+  }
+
+  const base = filename
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^[-.]+|[-.]+$/g, "");
+
+  if (!base || base.includes("..")) {
+    throw new Error("Media filename is invalid.");
+  }
+
+  if (!/\.(png|jpe?g|webp|svg)$/.test(base)) {
+    throw new Error("Media must use png, jpg, jpeg, webp, or svg.");
+  }
+
+  return `public/images/${collection}/${base}`;
 }

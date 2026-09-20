@@ -1,7 +1,7 @@
 import { getAllProjects, getAllResearch, getAllWriting, getProjectBySlug, getResearchBySlug, getWritingBySlug } from "@/lib/content";
 import { getCmsHistory, createBackupSnapshot } from "@/lib/cms/history";
 import { deleteCollectionFile, deleteMediaFile, publishBinaryMedia, publishCollectionFile, publishSiteContent, renameCollectionFile } from "@/lib/cms/publisher";
-import { findLocalMediaReferences, listLocalMedia, prepareMedia } from "@/lib/cms/media";
+import { findLocalMediaReferences, listLocalMedia, prepareCollectionMedia, prepareMedia } from "@/lib/cms/media";
 import { MAX_IMAGE_BYTES, validateAssetPath, validateMarkdown, validateSlug, validateUrl } from "@/lib/cms/validation";
 import { genericOperationId } from "@/lib/telegram/auth";
 import { revertRepositoryCommit } from "@/lib/github/client";
@@ -18,7 +18,7 @@ const collections = new Set<CmsCollection>(["projects", "writing", "research"]);
 const fieldSets: Record<CmsCollection, Array<{ key: string; label: string; optional?: boolean }>> = {
   projects: [
     { key: "title", label: "Project name" }, { key: "slug", label: "Slug" }, { key: "summary", label: "Summary" },
-    { key: "cover", label: "Cover path (for example /images/projects/example.jpg)" }, { key: "year", label: "Year" },
+    { key: "cover", label: "Cover image — upload a Telegram image, or send the site path" }, { key: "year", label: "Year" },
     { key: "status", label: "Status: Live, In Progress, Archived, or Experimental" }, { key: "categories", label: "Categories, comma separated" },
     { key: "stack", label: "Technology stack, comma separated" }, { key: "github", label: "GitHub URL", optional: true }, { key: "telegram", label: "Telegram URL", optional: true },
     { key: "demo", label: "Demo URL", optional: true }, { key: "images", label: "Gallery paths, comma separated", optional: true }, { key: "featured", label: "Featured? yes/no" }, { key: "published", label: "Published? yes/no" },
@@ -26,12 +26,12 @@ const fieldSets: Record<CmsCollection, Array<{ key: string; label: string; optio
   ],
   writing: [
     { key: "title", label: "Article title" }, { key: "slug", label: "Slug" }, { key: "description", label: "Excerpt" }, { key: "date", label: "Publication date (YYYY-MM-DD)" },
-    { key: "category", label: "Topic" }, { key: "tags", label: "Tags, comma separated" }, { key: "featuredImage", label: "Cover path", optional: true },
+    { key: "category", label: "Topic" }, { key: "tags", label: "Tags, comma separated" }, { key: "featuredImage", label: "Cover image — upload a Telegram image, or send the site path", optional: true },
     { key: "images", label: "Inline image paths, comma separated", optional: true }, { key: "featured", label: "Featured? yes/no" }, { key: "published", label: "Published? yes/no" }, { key: "content", label: "Article content (send Markdown text or a .md/.mdx file)" },
   ],
   research: [
     { key: "title", label: "Research title" }, { key: "slug", label: "Slug" }, { key: "summary", label: "Summary" }, { key: "date", label: "Publication date (YYYY-MM-DD)" },
-    { key: "topic", label: "Topic" }, { key: "tags", label: "Tags, comma separated" }, { key: "featuredImage", label: "Cover path", optional: true },
+    { key: "topic", label: "Topic" }, { key: "tags", label: "Tags, comma separated" }, { key: "featuredImage", label: "Cover image — upload a Telegram image, or send the site path", optional: true },
     { key: "images", label: "Figure paths, comma separated", optional: true }, { key: "featured", label: "Featured? yes/no" }, { key: "published", label: "Published? yes/no" }, { key: "content", label: "Research content (send Markdown text or a .md/.mdx file)" },
   ],
 };
@@ -274,6 +274,34 @@ async function publishSession(session: CmsSession) {
     if (!current) throw new Error("Content entry no longer exists.");
     const frontmatter = { ...(current as unknown as Record<string, unknown>) };
     const value = session.draft.value;
+
+    if ((key === "cover" || key === "featuredImage") && session.draft.__uploadedMedia) {
+      const uploaded = session.draft.__uploadedMedia as {
+        fileId?: string;
+        filename?: string;
+        mime?: string;
+        repositoryPath?: string;
+      };
+
+      if (!uploaded.fileId || !uploaded.filename || !uploaded.repositoryPath) {
+        throw new Error("Uploaded image metadata is incomplete.");
+      }
+
+      const file = await downloadFile(uploaded.fileId);
+
+      const media = prepareCollectionMedia(
+        collection,
+        uploaded.filename,
+        file.bytes,
+        uploaded.mime,
+      );
+
+      await publishBinaryMedia(
+        media.repositoryPath,
+        file.bytes,
+        `cms: upload ${collection} cover ${uploaded.filename}`,
+      );
+    }
     const content = key === "content" ? String(value) : collectionContent(collection, String(session.slug));
     if (key !== "content") frontmatter[key] = value;
     delete frontmatter.content;
@@ -326,6 +354,50 @@ async function publishSession(session: CmsSession) {
   }
   const collection = session.collection as CmsCollection;
   const draft = { ...session.draft };
+  const uploaded = draft.__uploadedMedia as {
+    fileId?: string;
+    filename?: string;
+    mime?: string;
+    repositoryPath?: string;
+  } | undefined;
+
+  delete draft.__uploadedMedia;
+
+  if (uploaded) {
+    if (!uploaded.fileId || !uploaded.filename || !uploaded.repositoryPath) {
+      throw new Error("Uploaded image metadata is incomplete.");
+    }
+
+    const file = await downloadFile(uploaded.fileId);
+
+    const media = prepareCollectionMedia(
+      collection,
+      String(
+        draft.cover !== undefined
+          ? draft.cover
+          : draft.featuredImage !== undefined
+            ? draft.featuredImage
+            : uploaded.filename,
+      ).split("/").pop() || uploaded.filename,
+      file.bytes,
+      uploaded.mime,
+    );
+
+    await publishBinaryMedia(
+      media.repositoryPath,
+      file.bytes,
+      `cms: upload ${collection} cover ${uploaded.filename}`,
+    );
+
+    if (draft.cover !== undefined) {
+      draft.cover = media.publicPath;
+    }
+
+    if (draft.featuredImage !== undefined) {
+      draft.featuredImage = media.publicPath;
+    }
+  }
+
   const content = String(draft.content || "");
   delete draft.content;
   const nextSlug = String(draft.slug || session.slug);
@@ -334,6 +406,144 @@ async function publishSession(session: CmsSession) {
     : await publishCollectionFile(collection, nextSlug, draft, content, session.slug ? "update" : "add");
   await deleteSession(session.id);
   await sendMessage(session.chatId, `✅ Changes committed.\n\n${result.message}\nCommit: ${result.sha}\n\nVercel deployment was triggered by the GitHub commit.`);
+}
+
+
+function collectionImageField(session: CmsSession): "cover" | "featuredImage" | null {
+  const collection = session.collection as CmsCollection;
+  const index = Number(session.step);
+  const field = fieldSets[collection]?.[index];
+
+  if (field?.key === "cover" || field?.key === "featuredImage") {
+    return field.key;
+  }
+
+  if (session.action === "field-edit" && (session.draft.key === "cover" || session.draft.key === "featuredImage")) {
+    return session.draft.key as "cover" | "featuredImage";
+  }
+
+  return null;
+}
+
+function collectionImageMime(message: TelegramMessage): string | undefined {
+  return message.document?.mime_type || (message.photo ? "image/jpeg" : undefined);
+}
+
+function collectionImageExtension(message: TelegramMessage): string {
+  const mime = collectionImageMime(message);
+
+  if (mime === "image/png") return "png";
+  if (mime === "image/webp") return "webp";
+  if (mime === "image/svg+xml") return "svg";
+  if (mime === "image/jpeg") return "jpg";
+
+  const filename = message.document?.file_name || "";
+  const match = filename.toLowerCase().match(/\.(png|jpe?g|webp|svg)$/);
+
+  return match ? match[1] === "jpeg" ? "jpg" : match[1] : "jpg";
+}
+
+function collectionImageFilename(
+  session: CmsSession,
+  message: TelegramMessage,
+): string {
+  const field = collectionImageField(session);
+
+  if (!field) {
+    throw new Error("This message is not an image upload step.");
+  }
+
+  const base = String(session.draft.slug || session.slug || "cover")
+    .toLowerCase()
+    .replace(/[^a-z0-9-]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "") || "cover";
+
+  const extension = collectionImageExtension(message);
+
+  return `${base}.${extension}`;
+}
+
+async function handleCollectionImageMessage(
+  message: TelegramMessage,
+  session: CmsSession,
+): Promise<boolean> {
+  const field = collectionImageField(session);
+
+  if (!field) return false;
+
+  const fileId = message.photo?.at(-1)?.file_id || message.document?.file_id;
+
+  if (!fileId) return false;
+
+  try {
+    const claimedSize = message.document?.file_size ?? message.photo?.at(-1)?.file_size;
+
+    if (claimedSize && claimedSize > MAX_IMAGE_BYTES) {
+      throw new Error("File exceeds the supported 8 MB size.");
+    }
+
+    const file = await downloadFile(fileId);
+    const filename = collectionImageFilename(session, message);
+    const mime = collectionImageMime(message);
+
+    const media = prepareCollectionMedia(
+      session.collection as CmsCollection,
+      filename,
+      file.bytes,
+      mime,
+    );
+
+    if (session.action === "field-edit") {
+      session.draft.value = media.publicPath;
+    } else {
+      session.draft[field] = media.publicPath;
+    }
+
+    session.draft.__uploadedMedia = {
+      fileId,
+      filename,
+      mime,
+      repositoryPath: media.repositoryPath,
+    };
+
+    const index = Number(session.step);
+    const next = index + 1;
+
+    if (session.action === "field-edit") {
+      session.step = "preview";
+      await saveSession(session);
+      await showCollectionPreview(session);
+      return true;
+    }
+
+    if (next >= fieldSets[session.collection as CmsCollection].length) {
+      session.step = "preview";
+      await saveSession(session);
+      await showCollectionPreview(session);
+      return true;
+    }
+
+    session.step = String(next);
+    await saveSession(session);
+    await askCollectionField(
+      message.chat.id,
+      session.id,
+      session.collection as CmsCollection,
+      next,
+      false,
+    );
+
+    return true;
+  } catch (error) {
+    await sendMessage(
+      message.chat.id,
+      `Image upload failed: ${error instanceof Error ? error.message : "Invalid image."}\n\nPlease send another image.`,
+      { reply_markup: cancelKeyboard() },
+    );
+
+    return true;
+  }
 }
 
 async function handleSessionMessage(message: TelegramMessage, session: CmsSession) {
@@ -567,9 +777,15 @@ export async function handleTelegramUpdate(update: TelegramUpdate) {
   // through the short-lived in-memory/Redis index for this chat.
   const session = await getActiveSession(userId, chatId);
   if (session) {
-    if (message.photo || (message.document && session.action === "media-upload")) {
-      await handleMediaMessage(message, session);
-      return;
+    if (message.photo || message.document) {
+      if (await handleCollectionImageMessage(message, session)) {
+        return;
+      }
+
+      if (session.action === "media-upload") {
+        await handleMediaMessage(message, session);
+        return;
+      }
     }
     if (message.document && (session.action === "content" || session.action === "field-edit") && (session.action === "field-edit" ? session.draft.key === "content" : fieldSets[session.collection as CmsCollection][Number(session.step)]?.key === "content")) {
       try {
