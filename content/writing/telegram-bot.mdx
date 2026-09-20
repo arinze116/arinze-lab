@@ -1,0 +1,160 @@
+---
+title: How I Built My First Telegram Bot
+description: >-
+  How I went from a simple Telegram bot idea to building an NFT automation
+  system with persistent state, wallet security, RPC failover, and real-world
+  debugging lessons.
+date: '2026-09-20'
+category: Development
+tags:
+  - Telegram
+  - Python
+  - Bots
+  - Web3
+featuredImage: /images/writing/telegram-bot.jpg
+published: true
+featured: true
+---
+My first serious Telegram bot started with a simple idea:
+
+Could I build a bot that watches for an NFT opportunity and reacts automatically?
+
+At first, I was mostly interested in making the automation work.
+
+I quickly discovered that getting the core action to work was only a small part of the problem.
+
+Once the bot had to monitor events, make decisions, interact with wallets, survive network failures, and stay running for long periods, I was dealing with a real software system.
+
+This project became one of the first times I had to think about reliability and security instead of just functionality.
+
+1. Starting with the idea
+
+The basic concept was an NFT sniper.
+
+The bot would monitor activity, identify an opportunity, decide whether it matched the conditions I cared about, and then attempt to act quickly.
+
+The basic pipeline was:
+
+Event detected
+      ↓
+Analyze event
+      ↓
+Make decision
+      ↓
+Prepare transaction
+      ↓
+Send transaction
+
+Speed mattered.
+
+The original goal was to keep the reaction time around two seconds or less.
+
+That immediately created an interesting engineering problem.
+
+Every step in the pipeline consumes time.
+
+If event detection takes too long, the opportunity may disappear.
+
+If the decision logic is slow, the transaction arrives late.
+
+If the RPC provider is slow, everything after that is affected.
+
+So latency became part of the architecture rather than something I could optimize at the end.
+
+2. Moving from a script to a system
+
+The first version was much simpler.
+
+I was mainly focused on getting the bot to detect something and react.
+
+But that approach doesn't work well when a process needs to remain running.
+
+The bot needed to remember what it had already seen and what it was doing.
+
+That's where persistent state became important.
+
+I used SQLite to store information instead of relying entirely on memory.
+
+That gave the bot a way to survive restarts without completely losing its state.
+
+The architecture started becoming:
+
+Telegram / Blockchain Events
+          ↓
+      Bot Logic
+          ↓
+       SQLite
+          ↓
+    Wallet / RPC Layer
+          ↓
+       Blockchain
+
+This was one of the first times I realized that persistence isn't just a database feature.
+
+It changes how you design the application.
+
+Once state exists outside the process, the application has to think about consistency, recovery, and what happens after a restart.
+
+3. Thinking about wallet security
+
+The next major problem was much more serious.
+
+The bot needed access to a wallet.
+
+That meant private-key security couldn't be treated as an afterthought.
+
+I implemented wallet encryption using AES-256-GCM rather than keeping private keys as plaintext application data.
+
+The idea was straightforward:
+
+Private key
+    ↓
+Encryption
+    ↓
+Encrypted storage
+    ↓
+Decrypt only when required
+    ↓
+Transaction signing
+
+The important part was reducing how often sensitive information needed to exist in plaintext.
+
+This project was also when I started taking environment variables, secret handling, and filesystem security much more seriously.
+
+A bot that can automatically control a wallet has a completely different security requirement from a normal Telegram utility bot.
+
+4. RPC reliability
+
+The blockchain connection became another obvious failure point.
+
+A single RPC endpoint isn't necessarily reliable enough for an automation system that cares about timing.
+
+An endpoint can become slow.
+
+It can return an error.
+
+It can rate-limit requests.
+
+It can temporarily stop responding.
+
+So I implemented multiple RPC endpoints and a failover strategy.
+
+Conceptually:
+
+             ┌── RPC 1
+             │
+Bot ─────────┼── RPC 2
+             │
+             ├── RPC 3
+             │
+             └── RPC fallback
+
+The important lesson was that external services need to be treated as dependencies that can fail.
+
+I couldn't control the RPC provider.
+
+I could control what my application did when the provider stopped behaving normally.
+
+5. Building on a Samsung S10
+
+Another unusual part of the project was the development environment.
