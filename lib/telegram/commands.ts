@@ -103,6 +103,32 @@ function setSiteValue(path: string, value: string): ReturnType<typeof getSiteCon
   return site;
 }
 
+async function beginPortraitUpload(chatId: number, userId: number) {
+  const id = await createSession(userId, chatId, "portrait-upload", {
+    oldValue: String(siteValue("about.portrait.src") ?? ""),
+  });
+
+  const session = await readSession(id);
+
+  if (session) {
+    session.step = "portrait";
+    await saveSession(session);
+  }
+
+  await sendMessage(
+    chatId,
+    `ABOUT PORTRAIT
+
+Current image:
+${siteValue("about.portrait.src") || "(empty)"}
+
+Send the new portrait as a Telegram photo or image document.
+
+Maximum size: 8 MB. No changes will be published until you confirm the preview.`,
+    { reply_markup: cancelKeyboard() },
+  );
+}
+
 async function beginSiteEdit(chatId: number, userId: number, path: string) {
   const id = await createSession(userId, chatId, "site-edit", { path, oldValue: String(siteValue(path) ?? "") });
   await sendMessage(chatId, `Step 1/1\n\n${path}\n\nCurrent value:\n${truncateTelegram(String(siteValue(path) ?? "(empty)"), 1_000)}\n\nSend the new value.`, { reply_markup: cancelKeyboard() });
@@ -253,6 +279,52 @@ async function showCollectionPreview(session: CmsSession) {
 }
 
 async function publishSession(session: CmsSession) {
+  if (session.action === "portrait-upload") {
+    const file = await downloadFile(String(session.draft.fileId));
+
+    const mime =
+      typeof session.draft.mime === "string"
+        ? session.draft.mime
+        : undefined;
+
+    const filename = String(
+      session.draft.filename || "portrait.webp",
+    );
+
+    const media = prepareMedia(
+      filename,
+      file.bytes,
+      mime,
+    );
+
+    await publishBinaryMedia(
+      media.repositoryPath,
+      file.bytes,
+      `cms: upload portrait ${filename}`,
+    );
+
+    const updated = structuredClone(getSiteContent());
+
+    updated.about.portrait.src = media.publicPath;
+
+    const result = await publishSiteContent(updated);
+
+    await deleteSession(session.id);
+
+    await sendMessage(
+      session.chatId,
+      `✅ Portrait updated and committed.
+
+Image: ${media.publicPath}
+Site settings: ${result.message}
+Commit: ${result.sha}
+
+Vercel deployment was triggered by the GitHub commit.`,
+    );
+
+    return;
+  }
+
   if (session.action === "site-edit") {
     const path = String(session.draft.path);
     const updated = setSiteValue(path, String(session.draft.value || ""));
@@ -408,6 +480,84 @@ async function publishSession(session: CmsSession) {
   await sendMessage(session.chatId, `✅ Changes committed.\n\n${result.message}\nCommit: ${result.sha}\n\nVercel deployment was triggered by the GitHub commit.`);
 }
 
+function portraitImageExtension(message: TelegramMessage): string {
+  const mime = message.document?.mime_type || (message.photo ? "image/jpeg" : undefined);
+
+  if (mime === "image/png") return "png";
+  if (mime === "image/webp") return "webp";
+  if (mime === "image/svg+xml") return "svg";
+
+  return "jpg";
+}
+
+async function handlePortraitImageMessage(
+  message: TelegramMessage,
+  session: CmsSession,
+): Promise<boolean> {
+  if (session.action !== "portrait-upload" || session.step !== "portrait") {
+    return false;
+  }
+
+  const fileId = message.photo?.at(-1)?.file_id || message.document?.file_id;
+
+  if (!fileId) return false;
+
+  try {
+    const claimedSize =
+      message.document?.file_size ?? message.photo?.at(-1)?.file_size;
+
+    if (claimedSize && claimedSize > MAX_IMAGE_BYTES) {
+      throw new Error("File exceeds the supported 8 MB size.");
+    }
+
+    const file = await downloadFile(fileId);
+    const mime =
+      message.document?.mime_type ||
+      (message.photo ? "image/jpeg" : undefined);
+
+    const filename = `portrait.${portraitImageExtension(message)}`;
+
+    const media = prepareMedia(
+      filename,
+      file.bytes,
+      mime,
+    );
+
+    session.draft.fileId = fileId;
+    session.draft.filename = filename;
+    session.draft.mime = mime || "image/jpeg";
+    session.draft.publicPath = media.publicPath;
+    session.step = "preview";
+
+    await saveSession(session);
+
+    await sendMessage(
+      message.chat.id,
+      `ARINZELAB PORTRAIT PREVIEW
+
+OLD:
+${session.draft.oldValue}
+
+NEW:
+${media.publicPath}
+
+No changes have been published.`,
+      { reply_markup: confirmKeyboard(session.id) },
+    );
+  } catch (error) {
+    await sendMessage(
+      message.chat.id,
+      `❌ Portrait upload failed.
+
+${error instanceof Error ? error.message : "Invalid image."}
+
+Please send another image.`,
+      { reply_markup: cancelKeyboard() },
+    );
+  }
+
+  return true;
+}
 
 function collectionImageField(session: CmsSession): "cover" | "featuredImage" | null {
   const collection = session.collection as CmsCollection;
@@ -712,6 +862,11 @@ async function routeCommand(message: TelegramMessage) {
   if (command === "start" || command === "admin") { await sendMessage(chatId, "ARINZELAB ADMIN\n\nSelect an area. All publishing requires preview and confirmation.", { reply_markup: adminKeyboard }); return; }
   if (command === "help") { await sendMessage(chatId, helpText()); return; }
   if (command === "cancel") { const active = await getActiveSession(userId, chatId); if (active) await deleteSession(active.id); await sendMessage(chatId, "Operation cancelled. No GitHub changes were made."); return; }
+  if (command === "about-portrait") {
+  await beginPortraitUpload(chatId, userId);
+  return;
+}
+
   if (["home", "about", "now", "settings", "seo"].includes(command)) {
     const site = getSiteContent();
     const paths = command === "home" ? [["Hero title", "homepage.hero.title"], ["Hero description", "homepage.hero.description"], ["Direction", "homepage.currentDirection.body"], ["Focus item 1", "homepage.focusAreas.0.label"], ["Selected project 1", "homepage.selectedProjects.0.slug"], ["Technical heading", "homepage.technicalFocus.heading"], ["Writing heading", "homepage.writing.heading"], ["Research heading", "homepage.research.heading"], ["Working now", "homepage.workingNow.body"], ["Opportunities heading", "homepage.opportunities.heading"], ["CTA description", "homepage.opportunities.description"]] : command === "about" ? [["About title", "about.title"], ["Intro", "about.intro.0"], ["Build heading", "about.whatIBuild.heading"], ["Principle 1", "about.howIWork.principles.0.text"], ["Current direction", "about.currentDirection.body"]] : command === "now" ? [["Now title", "now.title"], ["Description", "now.description"], ["Building items", "now.sections.0.items"], ["Learning items", "now.sections.1.items"], ["Exploring items", "now.sections.2.items"], ["Updated date", "now.updatedAt"]] : command === "seo" ? [["Global SEO title", "seo.title"], ["Global SEO description", "seo.description"], ["Canonical URL", "seo.canonicalUrl"], ["About SEO title", "pageSeo.about.title"], ["About SEO description", "pageSeo.about.description"], ["Contact SEO title", "pageSeo.contact.title"], ["Contact SEO description", "pageSeo.contact.description"]] : [["Site name", "name"], ["Email", "email"], ["Description", "description"], ["Availability", "availabilityText"], ...site.socials.map((social, index) => [`${social.label} URL`, `socials.${index}.href`] as [string, string])];
@@ -720,7 +875,17 @@ async function routeCommand(message: TelegramMessage) {
       ...getAllWriting().slice(0, 8).map((item) => [{ text: `+ writing: ${item.title}`.slice(0, 60), callback_data: `site-select:w:${item.slug}` }]),
       ...getAllResearch().slice(0, 8).map((item) => [{ text: `+ research: ${item.title}`.slice(0, 60), callback_data: `site-select:r:${item.slug}` }]),
     ] : [];
-    await sendMessage(chatId, `${command.toUpperCase()}\n\nChoose a field to edit.`, { reply_markup: { inline_keyboard: paths.map(([label, path]) => [{ text: label, callback_data: `site:edit:${path}` }]).concat(selectionButtons).concat([[{ text: "Cancel", callback_data: "cmd:cancel" }]]) } }); return;
+    await sendMessage(chatId, `${command.toUpperCase()}\n\nChoose a field to edit.`, { reply_markup: { inline_keyboard: paths.map(([label, path]) => [{ text: label, callback_data: `site:edit:${path}` }]).concat(
+  command === "about"
+    ? [[
+        {
+          text: "Portrait image",
+          callback_data: "cmd:about-portrait",
+        },
+      ]]
+    : [],
+)
+.concat(selectionButtons).concat([[{ text: "Cancel", callback_data: "cmd:cancel" }]]) } }); return;
   }
   if (command === "navigation") {
     const site = getSiteContent();
@@ -777,8 +942,12 @@ export async function handleTelegramUpdate(update: TelegramUpdate) {
   // through the short-lived in-memory/Redis index for this chat.
   const session = await getActiveSession(userId, chatId);
   if (session) {
-    if (message.photo || message.document) {
-      if (await handleCollectionImageMessage(message, session)) {
+  if (message.photo || message.document) {
+    if (await handlePortraitImageMessage(message, session)) {
+      return;
+    }
+
+    if (await handleCollectionImageMessage(message, session)) {
         return;
       }
 
