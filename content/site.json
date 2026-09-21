@@ -9,15 +9,53 @@
   "resumeUrl": "/resume",
   "availabilityText": "Open to considered opportunities.",
   "socials": [
-    { "platform": "github", "label": "GitHub", "href": "https://github.com/arinze116", "visible": true, "order": 1 },
-    { "platform": "linkedin", "label": "LinkedIn", "href": "https://linkedin.com/in/arinze-chinweuba", "visible": true, "order": 2 },
-    { "platform": "x", "label": "X", "href": "https://x.com/arinze116", "visible": true, "order": 3 }
+    {
+      "platform": "github",
+      "label": "GitHub",
+      "href": "https://github.com/arinze116",
+      "visible": true,
+      "order": 1
+    },
+    {
+      "platform": "linkedin",
+      "label": "LinkedIn",
+      "href": "https://linkedin.com/in/arinze-chinweuba",
+      "visible": true,
+      "order": 2
+    },
+    {
+      "platform": "x",
+      "label": "X",
+      "href": "https://x.com/arinze116",
+      "visible": true,
+      "order": 3
+    }
   ],
   "navigation": [
-    { "label": "Work", "href": "/projects", "visible": true, "order": 1 },
-    { "label": "Writing", "href": "/writing", "visible": true, "order": 2 },
-    { "label": "Research", "href": "/research", "visible": true, "order": 3 },
-    { "label": "About", "href": "/about", "visible": true, "order": 4 }
+    {
+      "label": "Work",
+      "href": "/projects",
+      "visible": true,
+      "order": 1
+    },
+    {
+      "label": "Writing",
+      "href": "/writing",
+      "visible": true,
+      "order": 2
+    },
+    {
+      "label": "Research",
+      "href": "/research",
+      "visible": true,
+      "order": 3
+    },
+    {
+      "label": "About",
+      "href": "/about",
+      "visible": true,
+      "order": 4
+    }
   ],
   "homepage": {
     "hero": {
@@ -25,9 +63,27 @@
       "title": "Software developer.\nSecurity researcher.\nBuilder.",
       "description": "I design practical software, investigate security problems, and build automation that earns its place in the workflow.",
       "buttons": [
-        { "label": "View work", "href": "/projects", "visible": true, "order": 1, "variant": "primary" },
-        { "label": "View resume", "href": "/resume", "visible": true, "order": 2, "variant": "secondary" },
-        { "label": "Get in touch", "href": "/contact", "visible": true, "order": 3, "variant": "text" }
+        {
+          "label": "View work",
+          "href": "/projects",
+          "visible": true,
+          "order": 1,
+          "variant": "primary"
+        },
+        {
+          "label": "View resume",
+          "href": "/resume",
+          "visible": true,
+          "order": 2,
+          "variant": "secondary"
+        },
+        {
+          "label": "Get in touch",
+          "href": "/contact",
+          "visible": true,
+          "order": 3,
+          "variant": "text"
+        }
       ]
     },
     "currentDirection": {
@@ -41,10 +97,26 @@
       "visible": true
     },
     "focusAreas": [
-      { "label": "Software systems", "visible": true, "order": 1 },
-      { "label": "Security research", "visible": true, "order": 2 },
-      { "label": "Automation & AI", "visible": true, "order": 3 },
-      { "label": "Web3 tooling", "visible": true, "order": 4 }
+      {
+        "label": "Software systems",
+        "visible": true,
+        "order": 1
+      },
+      {
+        "label": "Security research",
+        "visible": true,
+        "order": 2
+      },
+      {
+        "label": "Automation & AI",
+        "visible": true,
+        "order": 3
+      },
+      {
+        "label": "Web3 tooling",
+        "visible": true,
+        "order": 4
+      }
     ],
     "selectedProjects": [],
     "writing": {
@@ -66,10 +138,26 @@
       "heading": "Useful systems over impressive-looking demos.",
       "description": "",
       "items": [
-        { "label": "Software systems", "visible": true, "order": 1 },
-        { "label": "Security research", "visible": true, "order": 2 },
-        { "label": "Automation & AI", "visible": true, "order": 3 },
-        { "label": "Web3 tooling", "visible": true, "order": 4 }
+        {
+          "label": "Software systems",
+          "visible": true,
+          "order": 1
+        },
+        {
+          "label": "Security research",
+          "visible": true,
+          "order": 2
+        },
+        {
+          "label": "Automation & AI",
+          "visible": true,
+          "order": 3
+        },
+        {
+          "label": "Web3 tooling",
+          "visible": true,
+          "order": 4
+        }
       ],
       "visible": true
     },
@@ -96,24 +184,58 @@
       "I'm Arinze, a developer in Nigeria working across software engineering, automation, Telegram bots, Web3 tooling, and security research. I build end to end: from the first useful interaction through deployment and the maintenance that follows.",
       "A lot of my early work ran from Termux on a phone. That constraint taught me to make careful technical choices, keep systems lean, and distinguish a working demo from something that can keep running."
     ],
-    "portrait": { "src": "/images/portrait.svg", "alt": "Portrait of Arinze Chinweuba" },
+    "portrait": {
+      "src": "/images/cms/portrait.jpg",
+      "alt": "Portrait of Arinze Chinweuba"
+    },
     "whatIBuild": {
       "eyebrow": "What I build",
       "heading": "Tools that reduce friction and make risk easier to inspect.",
       "items": [
-        { "label": "Software & automation", "body": "Backend services and developer tools that turn repetitive workflows into dependable systems.", "visible": true, "order": 1 },
-        { "label": "Security & Web3", "body": "Contract-risk tooling and research that favors explicit signals over false certainty.", "visible": true, "order": 2 },
-        { "label": "Applied AI", "body": "Practical integrations that improve a specific workflow, rather than AI for its own sake.", "visible": true, "order": 3 }
+        {
+          "label": "Software & automation",
+          "body": "Backend services and developer tools that turn repetitive workflows into dependable systems.",
+          "visible": true,
+          "order": 1
+        },
+        {
+          "label": "Security & Web3",
+          "body": "Contract-risk tooling and research that favors explicit signals over false certainty.",
+          "visible": true,
+          "order": 2
+        },
+        {
+          "label": "Applied AI",
+          "body": "Practical integrations that improve a specific workflow, rather than AI for its own sake.",
+          "visible": true,
+          "order": 3
+        }
       ]
     },
     "howIWork": {
       "eyebrow": "How I work",
       "heading": "Constraint-driven, direct, and maintainable.",
       "principles": [
-        { "text": "Start with the smallest useful system, then make it reliable.", "visible": true, "order": 1 },
-        { "text": "Treat constraints as design inputs, not excuses.", "visible": true, "order": 2 },
-        { "text": "Prefer clear interfaces and inspectable behavior over cleverness.", "visible": true, "order": 3 },
-        { "text": "Document lessons so the next build begins with better questions.", "visible": true, "order": 4 }
+        {
+          "text": "Start with the smallest useful system, then make it reliable.",
+          "visible": true,
+          "order": 1
+        },
+        {
+          "text": "Treat constraints as design inputs, not excuses.",
+          "visible": true,
+          "order": 2
+        },
+        {
+          "text": "Prefer clear interfaces and inspectable behavior over cleverness.",
+          "visible": true,
+          "order": 3
+        },
+        {
+          "text": "Document lessons so the next build begins with better questions.",
+          "visible": true,
+          "order": 4
+        }
       ]
     },
     "currentDirection": {
@@ -121,16 +243,47 @@
       "body": "Open to thoughtful software engineering, security, AI automation, and Web3 opportunities.",
       "visible": true
     },
-    "cta": { "label": "Contact me", "url": "/contact", "visible": true }
+    "cta": {
+      "label": "Contact me",
+      "url": "/contact",
+      "visible": true
+    }
   },
   "now": {
     "eyebrow": "Now",
     "title": "A brief, human update.",
     "description": "A snapshot of what I'm actively building, learning, and testing.",
     "sections": [
-      { "label": "Building", "items": ["ArinzeLab", "Contrax contract scanner", "Developer automation"], "visible": true, "order": 1 },
-      { "label": "Learning", "items": ["Advanced TypeScript", "Rust basics", "Applied machine learning"], "visible": true, "order": 2 },
-      { "label": "Exploring", "items": ["Web3 tooling", "Reliable bot infrastructure", "Security heuristics"], "visible": true, "order": 3 }
+      {
+        "label": "Building",
+        "items": [
+          "ArinzeLab",
+          "Contrax contract scanner",
+          "Developer automation"
+        ],
+        "visible": true,
+        "order": 1
+      },
+      {
+        "label": "Learning",
+        "items": [
+          "Advanced TypeScript",
+          "Rust basics",
+          "Applied machine learning"
+        ],
+        "visible": true,
+        "order": 2
+      },
+      {
+        "label": "Exploring",
+        "items": [
+          "Web3 tooling",
+          "Reliable bot infrastructure",
+          "Security heuristics"
+        ],
+        "visible": true,
+        "order": 3
+      }
     ],
     "updatedAt": "2026-07-01"
   },
@@ -149,7 +302,20 @@
     "summaryLabel": "Summary",
     "summary": "Independent developer building software systems, developer automation, Telegram bots, and smart-contract risk tooling. Interested in practical backend and product engineering, with a focus on systems that remain useful under real operational constraints.",
     "skillsLabel": "Technical focus",
-    "skills": ["Python", "TypeScript", "JavaScript", "Node.js", "Next.js", "Telegram bot development", "Automation", "Smart-contract risk analysis", "Solana", "EVM", "Docker", "Linux / Termux"],
+    "skills": [
+      "Python",
+      "TypeScript",
+      "JavaScript",
+      "Node.js",
+      "Next.js",
+      "Telegram bot development",
+      "Automation",
+      "Smart-contract risk analysis",
+      "Solana",
+      "EVM",
+      "Docker",
+      "Linux / Termux"
+    ],
     "projectsLabel": "Selected projects",
     "researchWritingLabel": "Research & writing",
     "researchWritingDescription": "Published technical notes and research cover practical bot infrastructure, Termux-based development, video-processing pipelines, and heuristic smart-contract risk scoring."
@@ -158,19 +324,57 @@
     "title": "ArinzeLab.",
     "titleTemplate": "%s — ArinzeLab.",
     "description": "Software engineering, security research, automation, and technical writing by Arinze Chinweuba.",
-    "keywords": ["software engineering", "security research", "automation", "technical writing", "Web3"],
+    "keywords": [
+      "software engineering",
+      "security research",
+      "automation",
+      "technical writing",
+      "Web3"
+    ],
     "canonicalUrl": "https://arinzelab.vercel.app",
     "defaultOgImage": "/opengraph-image",
     "twitterImage": "/twitter-image"
   },
   "pageSeo": {
-    "home": { "title": "ArinzeLab.", "description": "Software engineering, security research, automation, and technical writing by Arinze Chinweuba.", "canonical": "/" },
-    "about": { "title": "About", "description": "Arinze Chinweuba is a software developer and security researcher building practical tools.", "canonical": "/about" },
-    "now": { "title": "Now", "description": "What Arinze is currently focused on.", "canonical": "/now" },
-    "contact": { "title": "Contact", "description": "Get in touch with Arinze for projects, collaborations, or questions.", "canonical": "/contact" },
-    "resume": { "title": "Resume", "description": "Professional profile and selected work by Arinze Chinweuba.", "canonical": "/resume" },
-    "projects": { "title": "Projects", "description": "A showcase of software Arinze has designed, built, and shipped.", "canonical": "/projects" },
-    "writing": { "title": "Writing", "description": "Articles, tutorials, engineering notes, and lessons from building software.", "canonical": "/writing" },
-    "research": { "title": "Research", "description": "Deeper technical explorations, experiments, and long-form analysis.", "canonical": "/research" }
+    "home": {
+      "title": "ArinzeLab.",
+      "description": "Software engineering, security research, automation, and technical writing by Arinze Chinweuba.",
+      "canonical": "/"
+    },
+    "about": {
+      "title": "About",
+      "description": "Arinze Chinweuba is a software developer and security researcher building practical tools.",
+      "canonical": "/about"
+    },
+    "now": {
+      "title": "Now",
+      "description": "What Arinze is currently focused on.",
+      "canonical": "/now"
+    },
+    "contact": {
+      "title": "Contact",
+      "description": "Get in touch with Arinze for projects, collaborations, or questions.",
+      "canonical": "/contact"
+    },
+    "resume": {
+      "title": "Resume",
+      "description": "Professional profile and selected work by Arinze Chinweuba.",
+      "canonical": "/resume"
+    },
+    "projects": {
+      "title": "Projects",
+      "description": "A showcase of software Arinze has designed, built, and shipped.",
+      "canonical": "/projects"
+    },
+    "writing": {
+      "title": "Writing",
+      "description": "Articles, tutorials, engineering notes, and lessons from building software.",
+      "canonical": "/writing"
+    },
+    "research": {
+      "title": "Research",
+      "description": "Deeper technical explorations, experiments, and long-form analysis.",
+      "canonical": "/research"
+    }
   }
 }
